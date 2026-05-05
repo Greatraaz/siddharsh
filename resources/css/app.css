@@ -1,0 +1,55 @@
+@import 'bootstrap/dist/css/bootstrap.min.css';
+@import 'bootstrap-icons/font/bootstrap-icons.css';
+@import 'datatables.net-bs5/css/dataTables.bootstrap5.min.css';
+@import 'sweetalert2/dist/sweetalert2.min.css';
+@import 'toastr/build/toastr.min.css';
+
+:root {
+    --primary-color: #4f46e5;
+    --sidebar-bg: #ffffff;
+    --main-bg: #f8fafc;
+}
+
+body {
+    background-color: var(--main-bg);
+    font-family: 'Inter', sans-serif;
+}
+
+/* Glassmorphism cards */
+.glass-card {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.sidebar {
+    width: 260px;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: var(--sidebar-bg);
+    border-right: 1px solid #e2e8f0;
+    z-index: 1000;
+    transition: all 0.3s;
+}
+
+.main-content {
+    margin-left: 260px;
+    padding: 20px;
+    transition: all 0.3s;
+}
+
+@media (max-width: 991.98px) {
+    .sidebar {
+        left: -260px;
+    }
+    .sidebar.active {
+        left: 0;
+    }
+    .main-content {
+        margin-left: 0;
+    }
+}
