@@ -17,30 +17,42 @@
 
                 <div class="mb-4">
                     <label class="form-label">Category</label>
-                    <select name="category_id" class="form-select" required>
+                    <select name="category_id" class="form-select @error('category_id') is-invalid @enderror" required>
                         <option value="">Select Category</option>
                         @foreach($categories as $category)
-                            <option value="{{ $category->id }}">{{ $category->name }}</option>
+                            <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
                         @endforeach
                     </select>
+                    @error('category_id')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                 </div>
 
                 <div class="mb-4">
                     <label class="form-label">Subcategory Name</label>
-                    <input type="text" name="name" class="form-control" required>
+                    <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" value="{{ old('name') }}" required>
+                    @error('name')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                 </div>
 
                 <div class="mb-4">
                     <label class="form-label">Subcategory Image</label>
-                    <input type="file" name="image" class="form-control" accept="image/png, image/jpeg, image/jpg, image/webp">
+                    <input type="file" name="image" class="form-control @error('image') is-invalid @enderror" accept="image/png, image/jpeg, image/jpg, image/webp">
+                    @error('image')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                 </div>
 
                 <div class="mb-4">
                     <label class="form-label">Status</label>
-                    <select name="status" class="form-select">
-                        <option value="1">Active</option>
-                        <option value="0">Inactive</option>
+                    <select name="status" class="form-select @error('status') is-invalid @enderror" required>
+                        <option value="1" {{ old('status') == '1' ? 'selected' : '' }}>Active</option>
+                        <option value="0" {{ old('status') == '0' ? 'selected' : '' }}>Inactive</option>
                     </select>
+                    @error('status')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                 </div>
 
                 <button class="btn btn-primary px-4">Save Subcategory</button>

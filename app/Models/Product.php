@@ -15,6 +15,7 @@ class Product extends Model
         'brand_id',
         'category_id',
         'subcategory_id',
+        'child_category_id',
         'name',
         'slug',
         'thumbnail',
@@ -50,5 +51,10 @@ class Product extends Model
     public function images()
     {
         return $this->hasMany(ProductImage::class);
+    }
+
+    public function childCategory()
+    {
+        return $this->belongsTo(ChildCategory::class);
     }
 }

@@ -30,7 +30,11 @@
 
                     <input type="text"
                            name="name"
-                           class="form-control">
+                           value="{{ old('name') }}"
+                           class="form-control @error('name') is-invalid @enderror" required>
+                    @error('name')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
 
                 </div>
 
@@ -42,7 +46,11 @@
 
                     <input type="file"
                            name="image"
-                           class="form-control">
+                           accept="image/png, image/jpeg, image/jpg, image/webp"
+                           class="form-control @error('image') is-invalid @enderror">
+                    @error('image')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
 
                 </div>
 
@@ -53,17 +61,20 @@
                     </label>
 
                     <select name="status"
-                            class="form-select">
+                            class="form-select @error('status') is-invalid @enderror" required>
 
-                        <option value="1">
+                        <option value="1" {{ old('status') == '1' ? 'selected' : '' }}>
                             Active
                         </option>
 
-                        <option value="0">
+                        <option value="0" {{ old('status') == '0' ? 'selected' : '' }}>
                             Inactive
                         </option>
 
                     </select>
+                    @error('status')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
 
                 </div>
 

@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Subcategory;
+use App\Models\ChildCategory;
 use Illuminate\Support\Str;
 
 class ProductController extends Controller
@@ -17,7 +18,7 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Product::with(['brand', 'category', 'subcategory'])->latest()->get();
+        $products = Product::with(['brand', 'category', 'subcategory', 'childCategory'])->latest()->get();
 
         return view('admin.products.index', compact('products'));
     }
@@ -29,8 +30,18 @@ class ProductController extends Controller
     {
         $brands = Brand::where('status', 1)->get();
         $categories = Category::where('status', 1)->get();
-        $subcategories = Subcategory::where('status', 1)->get();
-        return view('admin.products.create', compact('brands', 'categories', 'subcategories'));
+        
+        $subcategories = collect();
+        if (old('category_id')) {
+            $subcategories = Subcategory::where('category_id', old('category_id'))->where('status', 1)->get();
+        }
+
+        $childcategories = collect();
+        if (old('subcategory_id')) {
+            $childcategories = ChildCategory::where('subcategory_id', old('subcategory_id'))->where('status', 1)->get();
+        }
+
+        return view('admin.products.create', compact('brands', 'categories', 'subcategories', 'childcategories'));
     }
 
     /**
@@ -45,6 +56,7 @@ class ProductController extends Controller
             'brand_id'       => 'nullable|exists:brands,id',
             'category_id'    => 'required|exists:categories,id',
             'subcategory_id' => 'required|exists:subcategories,id',
+            'child_category_id' => 'nullable|exists:child_categories,id',
 
             'name'           => 'required|string|max:255|unique:products,name',
 
@@ -77,6 +89,7 @@ class ProductController extends Controller
             'brand_id'           => $request->brand_id,
             'category_id'        => $request->category_id,
             'subcategory_id'     => $request->subcategory_id,
+            'child_category_id'  => $request->child_category_id,
 
             'name'               => $request->name,
             'slug'               => Str::slug($request->name),
@@ -114,12 +127,17 @@ class ProductController extends Controller
          */
         public function edit(string $id)
         {
-            $product = Product::findOrFail($id);
-            $brands = Brand::where('status', 1)->get();
-            $categories = Category::where('status', 1)->get();
-            $subcategories = Subcategory::where('category_id', $product->category_id)->where('status', 1)->get();
-        //    dd($subcategories);
-            return view('admin.products.edit', compact('product', 'brands', 'categories', 'subcategories'));
+        $product = Product::findOrFail($id);
+        $brands = Brand::where('status', 1)->get();
+        $categories = Category::where('status', 1)->get();
+        
+        $categoryId = old('category_id', $product->category_id);
+        $subcategoryId = old('subcategory_id', $product->subcategory_id);
+
+        $subcategories = Subcategory::where('category_id', $categoryId)->where('status', 1)->get();
+        $childcategories = ChildCategory::where('subcategory_id', $subcategoryId)->where('status', 1)->get();
+
+        return view('admin.products.edit', compact('product', 'brands', 'categories', 'subcategories', 'childcategories'));
         }
 
     /**
@@ -134,6 +152,7 @@ class ProductController extends Controller
             'brand_id'       => 'nullable|exists:brands,id',
             'category_id'    => 'required|exists:categories,id',
             'subcategory_id' => 'required|exists:subcategories,id',
+            'child_category_id' => 'nullable|exists:child_categories,id',
 
             'name'           => 'required|unique:products,name,'.$product->id,
 
@@ -171,6 +190,7 @@ class ProductController extends Controller
             'brand_id'           => $request->brand_id,
             'category_id'        => $request->category_id,
             'subcategory_id'     => $request->subcategory_id,
+            'child_category_id'  => $request->child_category_id,
 
             'name'               => $request->name,
             'slug'               => Str::slug($request->name),

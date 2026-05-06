@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title') Admin Panel</title>
+    @php
+        $globalSetting = \App\Models\Setting::first();
+    @endphp
+    <title>@yield('title') {{ $globalSetting->site_title ?? 'Admin Panel' }}</title>
     
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -15,7 +18,12 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
     <!-- SweetAlert2 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-    <link rel="icon" href="{{ asset('uploads/fav.png') }}">    <style>
+    @if($globalSetting && $globalSetting->favicon)
+        <link rel="icon" href="{{ asset('uploads/settings/' . $globalSetting->favicon) }}">
+    @else
+        <link rel="icon" href="{{ asset('uploads/fav.png') }}">
+    @endif
+    <style>
         :root {
             --sidebar-width: 260px;
             --top-navbar-height: 70px;
@@ -32,6 +40,7 @@
             background-color: var(--main-bg);
             color: #1e293b;
             overflow-x: hidden;
+            font-size: 14px;
         }
 
         /* Sidebar */
@@ -56,9 +65,10 @@
         }
 
         #sidebar .nav-link {
-            padding: 12px 25px;
+            padding: 10px 20px;
             color: #64748b;
             font-weight: 500;
+            font-size: 14px;
             display: flex;
             align-items: center;
             border-radius: 8px;
@@ -165,6 +175,10 @@
         .status-toggle {
             cursor: pointer;
         }
+
+        /* Soft Utilities */
+        .bg-primary-soft { background-color: rgba(79, 70, 229, 0.1) !important; }
+        .text-primary-soft { color: #4f46e5 !important; }
     </style>
     @stack('css')
 </head>

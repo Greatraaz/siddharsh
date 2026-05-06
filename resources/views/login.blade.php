@@ -3,8 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login</title>
-   <link rel="icon" href="{{ asset('uploads/fav.png') }}">
+    @php
+        $globalSetting = \App\Models\Setting::first();
+    @endphp
+    <title>{{ $globalSetting->site_title ?? 'Admin Login' }}</title>
+    @if($globalSetting && $globalSetting->favicon)
+        <link rel="icon" href="{{ asset('uploads/settings/' . $globalSetting->favicon) }}">
+    @else
+        <link rel="icon" href="{{ asset('uploads/fav.png') }}">
+    @endif
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -344,8 +351,12 @@
 
             <div class="login-left">
 
-                <div class="logo-img">
-                    <img src="{{ asset('uploads/logo.png/') }}" alt="User" class="rounded-circle me-2" width="200">
+                <div class="logo-img text-center p-3">
+                    @if($globalSetting && $globalSetting->logo)
+                        <img src="{{ asset('uploads/settings/' . $globalSetting->logo) }}" alt="Logo" style="max-height: 80px; max-width: 100%;">
+                    @else
+                        <img src="{{ asset('uploads/logo.png') }}" alt="Logo" class="rounded-circle me-2" width="200">
+                    @endif
                 </div>
 
                 <h1 class="text-center">

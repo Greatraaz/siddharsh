@@ -18,19 +18,25 @@
 
                 <div class="mb-4">
                     <label class="form-label">Category</label>
-                    <select name="category_id" class="form-select" required>
+                    <select name="category_id" class="form-select @error('category_id') is-invalid @enderror" required>
                         <option value="">Select Category</option>
                         @foreach($categories as $category)
-                            <option value="{{ $category->id }}" {{ $subcategory->category_id == $category->id ? 'selected' : '' }}>
+                            <option value="{{ $category->id }}" {{ old('category_id', $subcategory->category_id) == $category->id ? 'selected' : '' }}>
                                 {{ $category->name }}
                             </option>
                         @endforeach
                     </select>
+                    @error('category_id')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                 </div>
 
                 <div class="mb-4">
                     <label class="form-label">Subcategory Name</label>
-                    <input type="text" name="name" class="form-control" value="{{ $subcategory->name }}" required>
+                    <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" value="{{ old('name', $subcategory->name) }}" required>
+                    @error('name')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                 </div>
 
                 <div class="mb-4">
@@ -40,15 +46,21 @@
                             <img src="{{ asset('uploads/subcategories/'.$subcategory->image) }}" width="80" height="80" class="rounded-3 object-fit-cover">
                         </div>
                     @endif
-                    <input type="file" name="image" class="form-control" accept="image/png, image/jpeg, image/jpg, image/webp">
+                    <input type="file" name="image" class="form-control @error('image') is-invalid @enderror" accept="image/png, image/jpeg, image/jpg, image/webp">
+                    @error('image')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                 </div>
 
                 <div class="mb-4">
                     <label class="form-label">Status</label>
-                    <select name="status" class="form-select">
-                        <option value="1" {{ $subcategory->status == '1' ? 'selected' : '' }}>Active</option>
-                        <option value="0" {{ $subcategory->status == '0' ? 'selected' : '' }}>Inactive</option>
+                    <select name="status" class="form-select @error('status') is-invalid @enderror" required>
+                        <option value="1" {{ old('status', $subcategory->status) == '1' ? 'selected' : '' }}>Active</option>
+                        <option value="0" {{ old('status', $subcategory->status) == '0' ? 'selected' : '' }}>Inactive</option>
                     </select>
+                    @error('status')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                 </div>
 
                 <button class="btn btn-primary px-4">Update Subcategory</button>

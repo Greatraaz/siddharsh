@@ -27,17 +27,20 @@
                             @else
                                 <img src="{{ asset('uploads/logo.png') }}" width="120" height="120" class="rounded-circle object-fit-cover shadow-sm mb-3" alt="Default Profile">
                             @endif
-                            <input type="file" name="profile_image" class="form-control form-control-sm" accept="image/png, image/jpeg, image/jpg, image/webp">
+                            <input type="file" name="profile_image" class="form-control form-control-sm @error('profile_image') is-invalid @enderror" accept="image/png, image/jpeg, image/jpg, image/webp">
+                            @error('profile_image') <small class="text-danger mt-1 d-block">{{ $message }}</small> @enderror
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Name</label>
-                            <input type="text" name="name" class="form-control" value="{{ $user->name }}" required>
+                            <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" value="{{ old('name', $user->name) }}" required>
+                            @error('name') <small class="text-danger">{{ $message }}</small> @enderror
                         </div>
 
                         <div class="mb-4">
                             <label class="form-label">Email</label>
-                            <input type="email" name="email" class="form-control" value="{{ $user->email }}" required>
+                            <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" value="{{ old('email', $user->email) }}" required>
+                            @error('email') <small class="text-danger">{{ $message }}</small> @enderror
                         </div>
 
                         <button class="btn btn-primary px-4">Save Changes</button>
@@ -57,8 +60,12 @@
 
                         <div class="mb-3">
                             <label class="form-label">New Password</label>
-                            <input type="password" name="password" class="form-control" required minlength="6">
-                            <small class="text-muted">Minimum 6 characters.</small>
+                            <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" required minlength="6">
+                            @error('password')
+                                <small class="text-danger">{{ $message }}</small>
+                            @else
+                                <small class="text-muted">Minimum 6 characters.</small>
+                            @enderror
                         </div>
 
                         <div class="mb-4">
