@@ -7,198 +7,152 @@
     }
 @endphp
 
-<div class="prod-card h-100">
-    <div class="prod-card-img-wrap">
-        <a href="{{ route('product.details', $product->slug) }}" class="prod-card-img-link">
-            @if($thumb)
-                <img src="{{ $thumb }}"
-                     alt="{{ $product->name }}"
-                     class="prod-card-img"
-                     loading="lazy">
-            @else
-                <div class="prod-card-no-img">
-                    <i class="fas fa-box-open"></i>
-                </div>
-            @endif
-        </a>
-
-        {{-- Brand badge --}}
+<div class="product-modern-card reveal h-100 shadow-sm">
+    <div class="product-card-upper">
+        @if($thumb)
+            <img src="{{ $thumb }}" alt="{{ $product->name }}" class="product-card-img-main" loading="lazy">
+        @else
+            <div class="product-card-placeholder">
+                <i class="fas fa-box-open"></i>
+            </div>
+        @endif
+        
         @if($product->brand)
-        <div class="prod-card-brand-badge">
+        <div class="prod-badge-brand">
             {{ $product->brand->name }}
         </div>
         @endif
     </div>
-
-    <div class="prod-card-body">
-        {{-- Category path --}}
-        <div class="prod-card-cat">
-            @if($product->category)
-                <a href="{{ route('category.products', $product->category->slug) }}" class="prod-card-cat-link">
-                    {{ $product->category->name }}
-                </a>
-                @if($product->subcategory)
-                    <span class="prod-card-cat-sep">›</span>
-                    <span class="prod-card-cat-link">{{ $product->subcategory->name }}</span>
-                @endif
-            @endif
+    <div class="product-card-lower">
+        <div class="product-card-info">
+            <h3 class="product-card-title">{{ $product->name }}</h3>
+            <p class="product-card-text">{{ $product->short_description ?? 'High-quality industrial networking solution.' }}</p>
         </div>
-
-        {{-- Product name --}}
-        <h3 class="prod-card-title">
-            <a href="{{ route('product.details', $product->slug) }}" class="prod-card-title-link">
-                {{ $product->name }}
-            </a>
-        </h3>
-
-        {{-- Actions --}}
-        <div class="prod-card-footer">
-            <a href="{{ route('product.details', $product->slug) }}" class="btn-inquiry btn-sm-pill prod-card-inquiry">
-                <i class="fas fa-paper-plane"></i> Send Inquiry
-            </a>
-            <a href="{{ route('product.details', $product->slug) }}" class="prod-card-details-link" aria-label="View details">
-                <i class="fas fa-arrow-right"></i>
+        
+        <div class="product-card-footer">
+            <a href="{{ route('product.details', $product->slug) }}" class="product-card-action-full">
+                Send Inquiry <i class="fas fa-arrow-right ms-2"></i>
             </a>
         </div>
     </div>
 </div>
 
 <style>
-/* ─── PRODUCT CARD ───────────────────────────────────── */
-.prod-card {
+/* ─── MODERN PRODUCT CARD ───────────────────────────── */
+.product-modern-card {
     background: #fff;
-    border: 1px solid var(--border-light);
-    border-radius: var(--radius);
+    border-radius: 10px; /* Subtle border radius */
     overflow: hidden;
-    transition: var(--transition);
     display: flex;
     flex-direction: column;
-}
-.prod-card:hover {
-    border-color: var(--primary);
-    box-shadow: 0 12px 40px rgba(3,138,107,0.12);
-    transform: translateY(-6px);
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    border: 1px solid #f0f0f0;
 }
 
-/* Image */
-.prod-card-img-wrap {
+.product-modern-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+}
+
+.product-card-upper {
+    height: 260px; /* Large image area */
+    background: #fdfdfd; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px; /* Reduced padding for larger image */
     position: relative;
-    background: var(--bg-light);
-    height: 220px;
     overflow: hidden;
 }
-.prod-card-img-link {
-    display: block;
-    width: 100%; height: 100%;
-}
-.prod-card-img {
-    width: 100%; height: 100%;
-    object-fit: contain;
-    padding: 16px;
-    transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.prod-card:hover .prod-card-img { transform: scale(1.06); }
 
-.prod-card-no-img {
-    width: 100%; height: 100%;
-    display: flex; align-items: center; justify-content: center;
-    background: var(--bg-light-2);
-    color: var(--text-light);
-    font-size: 2.5rem;
+.product-card-img-main {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* Keeps entire product visible */
+    /* padding: 15px; Subtle breathing room */
+    transition: transform 0.6s ease;
 }
 
-/* Brand badge */
-.prod-card-brand-badge {
+.product-modern-card:hover .product-card-img-main {
+    transform: scale(1.1);
+}
+
+.prod-badge-brand {
     position: absolute;
-    top: 12px; left: 12px;
-    background: rgba(255,255,255,0.92);
-    backdrop-filter: blur(6px);
-    border: 1px solid var(--border);
-    border-radius: 50px;
-    padding: 4px 12px;
-    font-size: 0.68rem;
+    top: 12px; right: 12px;
+    background: var(--primary);
+    color: #fff;
+    padding: 3px 10px;
+    border-radius: 4px;
+    font-size: 0.6rem;
     font-weight: 700;
-    color: var(--primary);
     text-transform: uppercase;
-    letter-spacing: 0.08em;
-    box-shadow: var(--shadow-sm);
+    letter-spacing: 0.05em;
+    z-index: 2;
 }
 
-/* Body */
-.prod-card-body {
-    padding: 18px 20px 20px;
+.product-card-lower {
+    padding: 20px;
+    flex: 1;
     display: flex;
     flex-direction: column;
-    flex: 1;
-    gap: 6px;
+    text-align: center;
+    background: #fff;
 }
 
-/* Category path */
-.prod-card-cat {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    flex-wrap: wrap;
-}
-.prod-card-cat-link {
-    font-size: 0.72rem;
-    font-weight: 600;
-    color: var(--text-light);
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    transition: var(--transition-fast);
-}
-.prod-card-cat-link:hover { color: var(--primary); }
-.prod-card-cat-sep { color: var(--text-light); font-size: 0.72rem; }
-
-/* Title */
-.prod-card-title {
-    font-size: 0.95rem;
+.product-card-title {
+    font-size: 1rem;
     font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 12px;
     line-height: 1.4;
-    margin: 4px 0 0;
-    flex: 1;
-}
-.prod-card-title-link {
-    color: var(--text-main);
-    transition: var(--transition-fast);
-}
-.prod-card-title-link:hover { color: var(--primary); }
-
-/* SKU */
-.prod-card-sku {
-    font-size: 0.72rem;
-    color: var(--text-light);
-    font-weight: 500;
-    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    height: 2.8rem;
 }
 
-/* Footer actions */
-.prod-card-footer {
+.product-card-text {
+    font-size: 0.8rem;
+    color: #666;
+    line-height: 1.5;
+    margin-bottom: 20px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    height: 2.4rem;
+}
+
+.product-card-footer {
+    margin-top: auto;
+    padding-top: 15px;
+}
+
+.product-card-action-full {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    margin-top: 14px;
-    padding-top: 14px;
-    border-top: 1px solid var(--border-light);
-    gap: 10px;
+    justify-content: center;
+    background: var(--primary);
+    color: #fff !important;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    width: 100%;
+    text-decoration: none;
 }
 
-.prod-card-inquiry { flex: 1; justify-content: center; font-size: 0.78rem; }
-
-.prod-card-details-link {
-    width: 36px; height: 36px;
-    border-radius: 50%;
-    border: 1.5px solid var(--border);
-    display: inline-flex; align-items: center; justify-content: center;
-    color: var(--text-muted);
-    font-size: 0.8rem;
-    flex-shrink: 0;
-    transition: var(--transition-fast);
+.product-card-action-full:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(3, 138, 107, 0.3);
 }
-.prod-card-details-link:hover {
-    border-color: var(--primary);
-    color: var(--primary);
-    background: var(--primary-soft);
+
+.product-card-placeholder {
+    font-size: 3.5rem;
+    color: #eee;
 }
 </style>

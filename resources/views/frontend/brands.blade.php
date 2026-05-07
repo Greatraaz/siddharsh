@@ -7,19 +7,23 @@
 
 {{-- Page Banner --}}
 <section class="page-banner">
-    <div class="container position-relative" style="z-index:2;">
+    <div class="container">
         <nav aria-label="breadcrumb">
-            <ol class="breadcrumb mb-3">
+            <ol class="breadcrumb mb-2 justify-content-center">
                 <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
-                <li class="breadcrumb-item active">Brands</li>
+                <li class="breadcrumb-item active fw-700">Brands</li>
             </ol>
         </nav>
-        <div class="d-flex align-items-end justify-content-between gap-4 flex-wrap">
-            <div>
-                <span class="section-label" style="background:rgba(3,138,107,0.2);color:var(--primary-light);">All Partners</span>
-                <h1 class="section-title text-white mt-2">Brands</h1>
-                <p class="page-banner-sub mt-2">{{ $brands->total() }} brands available</p>
+        <div class="banner-content">
+            <h1 class="mb-0">Brands</h1>
+        </div>
+
+        <div class="brands-header-actions d-flex align-items-center justify-content-between gap-4 flex-wrap mt-5 pt-4 border-top border-white border-opacity-10">
+            <div class="brand-count-info">
+                <span class="fs-sm fw-600 text-white-50 ls-wide text-uppercase">Availability</span>
+                <h2 class="h4 text-white mb-0 fw-700">{{ $brands->total() }} Brands Available</h2>
             </div>
+            
             {{-- Search --}}
             <div class="brands-search-wrap">
                 <div class="brands-search-box">
@@ -36,21 +40,8 @@
     <div class="container">
         <div class="row g-4" id="brandGrid">
             @forelse($brands as $brand)
-            <div class="col-xl-2 col-lg-3 col-md-4 col-6 brand-item reveal" data-name="{{ strtolower($brand->name) }}">
-                <a href="{{ route('brand.products', $brand->slug) }}" class="brand-card">
-                    <div class="brand-card-logo">
-                        @if($brand->image)
-                            <img src="{{ asset('uploads/brands/'.$brand->image) }}"
-                                 alt="{{ $brand->name }}"
-                                 class="brand-card-img"
-                                 loading="lazy">
-                        @else
-                            <div class="brand-card-initial">{{ strtoupper(substr($brand->name,0,2)) }}</div>
-                        @endif
-                    </div>
-                    <h3 class="brand-card-name brand-name">{{ $brand->name }}</h3>
-                    <span class="brand-card-cta">View Products <i class="fas fa-arrow-right"></i></span>
-                </a>
+            <div class="col-xl-2 col-lg-3 col-md-4 col-6 brand-item" data-name="{{ strtolower($brand->name) }}">
+                @include('frontend.components.brand-card', ['brand' => $brand])
             </div>
             @empty
             <div class="col-12">
@@ -113,66 +104,6 @@
 }
 .brands-search-input::placeholder { color: rgba(255,255,255,0.4); }
 
-/* ─── BRAND CARD ─────────────────────────────────────── */
-.brand-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    background: #fff;
-    border: 1px solid var(--border-light);
-    border-radius: var(--radius);
-    padding: 28px 16px 20px;
-    transition: var(--transition);
-    gap: 10px;
-    height: 100%;
-}
-.brand-card:hover {
-    border-color: var(--primary);
-    box-shadow: var(--shadow-md);
-    transform: translateY(-6px);
-}
-.brand-card-logo {
-    height: 80px;
-    display: flex; align-items: center; justify-content: center;
-    width: 100%;
-}
-.brand-card-img {
-    max-height: 56px;
-    max-width: 110px;
-    object-fit: contain;
-    filter: grayscale(1);
-    opacity: 0.5;
-    transition: var(--transition);
-}
-.brand-card:hover .brand-card-img { filter: grayscale(0); opacity: 1; }
-.brand-card-initial {
-    width: 60px; height: 60px;
-    border-radius: 14px;
-    background: var(--primary-soft);
-    color: var(--primary);
-    font-weight: 800;
-    font-size: 1.2rem;
-    display: flex; align-items: center; justify-content: center;
-}
-.brand-card-name {
-    font-size: 0.88rem;
-    font-weight: 700;
-    color: var(--text-main);
-    margin: 0;
-    line-height: 1.3;
-}
-.brand-card-cta {
-    font-size: 0.72rem;
-    font-weight: 600;
-    color: var(--text-light);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    display: inline-flex; align-items: center; gap: 5px;
-    transition: var(--transition-fast);
-    margin-top: auto;
-}
-.brand-card:hover .brand-card-cta { color: var(--primary); gap: 8px; }
 </style>
 @endpush
 

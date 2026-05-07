@@ -9,9 +9,14 @@
             <h3 class="fw-bold mb-1">Products</h3>
             <p class="text-muted mb-0">Manage all products</p>
         </div>
-        <a href="{{ route('admin.products.create') }}" class="btn btn-primary rounded-pill px-4">
-            <i class="fa-solid fa-plus"></i> Add Product
-        </a>
+        <div class="d-flex gap-2">
+            <a href="{{ route('admin.products.export') }}" class="btn btn-success rounded-pill px-4">
+                <i class="fa-solid fa-file-excel me-1"></i> Export
+            </a>
+            <a href="{{ route('admin.products.create') }}" class="btn btn-primary rounded-pill px-4">
+                <i class="fa-solid fa-plus"></i> Add Product
+            </a>
+        </div>
     </div>
 
     <div class="card border-0 shadow-sm rounded-4">
@@ -24,6 +29,7 @@
                             <th>#</th>
                             <th>Image</th>
                             <th>Brand</th>
+                            <th>Part Code</th>
                             <th>Category</th>
                             <th>Subcategory</th>
                             <th>Name</th>
@@ -43,6 +49,7 @@
                                     @endif
                                 </td>
                                 <td>{{ $product->brand->name ?? 'N/A' }}</td>
+                                <td><span class="fw-bold text-primary">{{ $product->part_code }}</span></td>
                                 <td>{{ $product->category->name ?? 'N/A' }}</td>
                                 <td>{{ $product->subcategory->name ?? 'N/A' }}</td>
                                 <td>{{ $product->name }}</td>

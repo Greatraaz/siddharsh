@@ -21,9 +21,9 @@
                 <div class="hero-overlay"></div>
                 <div class="container hero-content">
                     <div class="row">
-                        <div class="col-lg-8">
+                        <div class="col-lg-10">
                             <p class="hero-eyebrow">Next-Gen Networking</p>
-                            <h1 class="hero-title">High Performance <br><span class="hero-highlight">Data Centers</span></h1>
+                            <h1 class="hero-title" style="line-height: 1.1; font-weight: 900;">High Performance <br><span class="hero-highlight">Data Center</span></h1>
                             <p class="hero-sub">Deploy scalable and secure networking solutions from industry leaders like Cisco and HPE.</p>
                             <div class="hero-actions">
                                 <a href="{{ route('categories') }}" class="btn btn-primary btn-lg">Explore Solutions</a>
@@ -41,7 +41,7 @@
                     <div class="row">
                         <div class="col-lg-8">
                             <p class="hero-eyebrow">Unmatched Reliability</p>
-                            <h1 class="hero-title">Secure & Scalable <br><span class="hero-highlight">Cloud Foundations</span></h1>
+                            <h1 class="hero-title" style="line-height: 1.1; font-weight: 900;">Secure & Scalable <br><span class="hero-highlight">Cloud Foundations</span></h1>
                             <p class="hero-sub">The backbone of your business deserves the best-in-class hardware and support.</p>
                             <div class="hero-actions">
                                 <a href="{{ route('search') }}" class="btn btn-primary btn-lg">View Products</a>
@@ -92,94 +92,16 @@
             <a href="{{ route('categories') }}" class="section-view-all">View All Categories <i class="fas fa-arrow-right"></i></a>
         </div>
         <div class="row g-4 mt-2">
-            @foreach($latestCategories as $i => $cat)
-            @php $catImg = $cat->image ? asset('uploads/categories/'.$cat->image) : 'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&w=600&q=80'; @endphp
-            <div class="col-xl col-lg-3 col-md-4 col-6">
-                <a href="{{ route('category.products', $cat->slug) }}" class="cat-mini-card reveal reveal-delay-{{ min($i+1,4) }}">
-                    <div class="cat-mini-img img-zoom-wrap">
-                        <img src="{{ $catImg }}" alt="{{ $cat->name }}" loading="lazy">
-                    </div>
-                    <div class="cat-mini-body">
-                        <h3 class="cat-mini-name">{{ $cat->name }}</h3>
-                        <span class="cat-mini-arrow"><i class="fas fa-arrow-right"></i></span>
-                    </div>
-                </a>
+            @foreach($latestCategories->take(4) as $i => $cat)
+            <div class="col-xl-3 col-lg-3 col-md-6 col-12">
+                @include('frontend.components.category-card', ['category' => $cat])
             </div>
             @endforeach
         </div>
     </div>
 </section>
 
-{{-- ══════════════════════════════════════════
-     4. SUB CATEGORIES
-══════════════════════════════════════════ --}}
-<section class="section-py bg-white" aria-labelledby="subcats-heading">
-    <div class="container">
-        <div class="section-header reveal">
-            <div>
-                <span class="section-label">Explore</span>
-                <h2 class="section-title" id="subcats-heading">Sub Categories</h2>
-            </div>
-            <a href="{{ route('subcategories') }}" class="section-view-all">View All Sub Categories <i class="fas fa-arrow-right"></i></a>
-        </div>
-        <div class="row g-4 mt-2">
-            @foreach($latestSubcategories as $i => $sub)
-            @php $subImg = $sub->image ? asset('uploads/subcategories/'.$sub->image) : 'https://images.unsplash.com/photo-1558494949-ef010cbdcc51?auto=format&fit=crop&w=600&q=80'; @endphp
-            <div class="col-xl col-lg-3 col-md-4 col-6">
-                <a href="{{ route('subcategory.products', $sub->slug) }}" class="cat-mini-card reveal reveal-delay-{{ min($i+1,4) }}">
-                    <div class="cat-mini-img img-zoom-wrap">
-                        <img src="{{ $subImg }}" alt="{{ $sub->name }}" loading="lazy">
-                    </div>
-                    <div class="cat-mini-body">
-                        <p class="cat-mini-parent">{{ $sub->category->name ?? '' }}</p>
-                        <h3 class="cat-mini-name">{{ $sub->name }}</h3>
-                        <span class="cat-mini-arrow"><i class="fas fa-arrow-right"></i></span>
-                    </div>
-                </a>
-            </div>
-            @endforeach
-        </div>
-    </div>
-</section>
 
-{{-- ══════════════════════════════════════════
-     5. CHILD CATEGORIES
-══════════════════════════════════════════ --}}
-<section class="section-py bg-light-brand" aria-labelledby="childcats-heading">
-    <div class="container">
-        <div class="section-header reveal">
-            <div>
-                <span class="section-label">Discover</span>
-                <h2 class="section-title" id="childcats-heading">Child Categories</h2>
-            </div>
-            <a href="{{ route('childcategories') }}" class="section-view-all">View All Child Categories <i class="fas fa-arrow-right"></i></a>
-        </div>
-        <div class="row g-3 mt-2">
-            @foreach($latestChildCategories as $i => $child)
-            @php 
-                $childImg = $child->image;
-                if (!filter_var($childImg, FILTER_VALIDATE_URL)) {
-                    $childImg = $childImg ? asset('uploads/childcategories/'.$childImg) : 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=400&q=80';
-                }
-            @endphp
-            <div class="col-lg-3 col-md-4 col-6">
-                <a href="{{ route('childcategory.products', $child->slug) }}" class="cat-mini-card reveal reveal-delay-{{ min($i+1,4) }}">
-                    <div class="cat-mini-img img-zoom-wrap" style="height: 140px;">
-                        <img src="{{ $childImg }}" alt="{{ $child->name }}" loading="lazy">
-                    </div>
-                    <div class="cat-mini-body py-2 px-3">
-                        <div>
-                            <p class="cat-mini-parent mb-0" style="font-size: 0.65rem;">{{ $child->subcategory->name ?? '' }}</p>
-                            <h3 class="cat-mini-name" style="font-size: 0.85rem;">{{ $child->name }}</h3>
-                        </div>
-                        <span class="cat-mini-arrow" style="width: 26px; height: 26px;"><i class="fas fa-chevron-right" style="font-size: 0.65rem;"></i></span>
-                    </div>
-                </a>
-            </div>
-            @endforeach
-        </div>
-    </div>
-</section>
 
 {{-- ══════════════════════════════════════════
      6. BRANDS
@@ -195,15 +117,8 @@
         </div>
         <div class="row g-4 mt-2">
             @foreach($latestBrands as $i => $brand)
-            <div class="col-xl col-lg-3 col-md-4 col-6">
-                <a href="{{ route('brand.products', $brand->slug) }}" class="brand-logo-card reveal reveal-delay-{{ min($i+1,4) }}">
-                    @if($brand->image)
-                        <img src="{{ asset('uploads/brands/'.$brand->image) }}" alt="{{ $brand->name }}" class="brand-logo-img" loading="lazy">
-                    @else
-                        <div class="brand-logo-initial">{{ strtoupper(substr($brand->name,0,2)) }}</div>
-                    @endif
-                    <p class="brand-logo-name">{{ $brand->name }}</p>
-                </a>
+            <div class="col-xl-2 col-lg-3 col-md-4 col-6">
+                @include('frontend.components.brand-card', ['brand' => $brand])
             </div>
             @endforeach
         </div>
@@ -225,7 +140,7 @@
         </div>
         <div class="row g-4 mt-2">
             @foreach($featuredProducts as $i => $product)
-            <div class="col-xl-3 col-lg-4 col-md-6 reveal reveal-delay-{{ min($i%4+1,4) }}">
+            <div class="col-xl-3 col-lg-3 col-md-6 reveal reveal-delay-{{ min($i%3+1,3) }}">
                 @include('frontend.components.product-card', ['product' => $product])
             </div>
             @endforeach
@@ -363,25 +278,32 @@
     margin-bottom: 20px;
 }
 .hero-title {
-    font-size: clamp(2.4rem, 6vw, 4rem);
+    font-size: clamp(2.6rem, 7vw, 4.5rem);
     font-weight: 900;
     color: #fff;
-    line-height: 1.1;
-    letter-spacing: -0.03em;
+    line-height: 1.05;
+    letter-spacing: -0.04em;
     margin-bottom: 24px;
+    text-shadow: 0 10px 30px rgba(0,0,0,0.3);
 }
 .hero-highlight {
-    background: linear-gradient(90deg, var(--primary-light), #7fffd4);
+    background: linear-gradient(90deg, #7fffd4, var(--primary-light), #7fffd4);
+    background-size: 200% auto;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    animation: shine 3s linear infinite;
+}
+@keyframes shine {
+    to { background-position: 200% center; }
 }
 .hero-sub {
-    font-size: 1.05rem;
-    color: rgba(255,255,255,0.65);
-    max-width: 520px;
-    line-height: 1.8;
+    font-size: 1.15rem;
+    color: rgba(255,255,255,0.8);
+    max-width: 600px;
+    line-height: 1.6;
     margin-bottom: 40px;
+    font-weight: 400;
 }
 .hero-actions { display: flex; gap: 16px; flex-wrap: wrap; }
 .btn-hero-outline {
@@ -590,54 +512,6 @@
 }
 .child-cat-card:hover .child-cat-arr { color: var(--primary); transform: translateX(3px); }
 
-/* ─── BRAND LOGO CARD ────────────────────────────────── */
-.brand-logo-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    background: #fff;
-    border: 1px solid var(--border-light);
-    border-radius: var(--radius);
-    padding: 28px 20px 20px;
-    text-align: center;
-    height: 140px;
-    transition: var(--transition);
-}
-.brand-logo-card:hover {
-    border-color: var(--primary);
-    box-shadow: var(--shadow-md);
-    transform: translateY(-5px);
-}
-.brand-logo-img {
-    max-height: 48px;
-    max-width: 120px;
-    object-fit: contain;
-    filter: grayscale(1);
-    opacity: 0.5;
-    transition: var(--transition);
-}
-.brand-logo-card:hover .brand-logo-img { filter: grayscale(0); opacity: 1; }
-.brand-logo-initial {
-    width: 52px; height: 52px;
-    border-radius: 12px;
-    background: var(--primary-soft);
-    color: var(--primary);
-    font-weight: 800;
-    font-size: 1.1rem;
-    display: flex; align-items: center; justify-content: center;
-}
-.brand-logo-name {
-    font-size: 0.75rem;
-    font-weight: 700;
-    color: var(--text-muted);
-    margin: 0;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    transition: var(--transition-fast);
-}
-.brand-logo-card:hover .brand-logo-name { color: var(--primary); }
 
 /* ─── CTA SECTION ────────────────────────────────────── */
 .cta-section {

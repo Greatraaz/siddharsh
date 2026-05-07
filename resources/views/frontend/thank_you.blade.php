@@ -3,6 +3,21 @@
 @section('title', 'Thank You — ' . ($settings->site_title ?? 'Siddharsh'))
 
 @section('content')
+ 
+{{-- ── Page Banner ─────────────────────────────────────── --}}
+<section class="page-banner">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-2 justify-content-center">
+                <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
+                <li class="breadcrumb-item active fw-700">Inquiry Success</li>
+            </ol>
+        </nav>
+        <div class="banner-content">
+            <h1 class="mb-0">Thank You</h1>
+        </div>
+    </div>
+</section>
 
 {{-- ── Thank You Hero ────────────────────────────────── --}}
 <section class="thank-you-section section-py bg-white">

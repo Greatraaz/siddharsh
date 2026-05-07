@@ -1,5 +1,6 @@
 @php
     $headerCategories = \App\Models\Category::with(['subcategories.childCategories'])->where('status', 1)->get();
+    $headerBrands     = \App\Models\Brand::where('status', 1)->get();
     $headerSettings   = \App\Models\Setting::first();
 @endphp
 
@@ -147,14 +148,29 @@
                                 </div>
                             </div>
                         </li>
-                        <li class="nav-item has-dropdown">
-                            <a href="#" class="nav-link-item">
+                        <li class="nav-item has-mega">
+                            <a href="{{ route('brands') }}" class="nav-link-item {{ request()->routeIs('brands') ? 'active' : '' }}">
                                 Alliances <i class="fas fa-chevron-down nav-arrow"></i>
                             </a>
-                            <ul class="nav-dropdown">
-                                <li><a href="{{ route('brands') }}">Our Partners</a></li>
-                                <li><a href="#">Become a Partner</a></li>
-                            </ul>
+                            <div class="mega-menu alliances-mega">
+                                <div class="container-fluid px-5 py-4">
+                                    <div class="d-flex justify-content-between align-items-center mb-4">
+                                        <h4 class="mega-title-simple">Our Technology Partners</h4>
+                                        <a href="{{ route('brands') }}" class="btn-view-all-brands">View All Brands <i class="fas fa-arrow-right"></i></a>
+                                    </div>
+                                    <div class="alliances-grid">
+                                        @foreach($headerBrands as $b)
+                                        <a href="{{ route('brand.details', $b->slug) }}" class="mega-brand-box">
+                                            @if($b->image)
+                                                <img src="{{ asset('uploads/brands/'.$b->image) }}" alt="{{ $b->name }}">
+                                            @else
+                                                <span class="mega-brand-text">{{ $b->name }}</span>
+                                            @endif
+                                        </a>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div>
                         </li>
                         <li class="nav-item has-dropdown">
                             <a href="#" class="nav-link-item">
@@ -166,7 +182,7 @@
                             </ul>
                         </li>
                         <li class="nav-item">
-                            <a href="#" class="nav-link-item">News & Events</a>
+                            <a href="{{ route('part.list') }}" class="nav-link-item {{ request()->routeIs('part.list') ? 'active' : '' }}">Part List</a>
                         </li>
                         <li class="nav-item">
                             <a href="#contact-section" class="nav-link-item">Contact us</a>
@@ -262,7 +278,7 @@
 
                 <li><a href="{{ route('brands') }}" class="mobile-menu-link">Alliances</a></li>
                 <li><a href="#" class="mobile-menu-link">Services</a></li>
-                <li><a href="#" class="mobile-menu-link">News & Events</a></li>
+                <li><a href="{{ route('part.list') }}" class="mobile-menu-link {{ request()->routeIs('part.list') ? 'active' : '' }}">Part List</a></li>
                 <li><a href="#contact-section" class="mobile-menu-link">Contact us</a></li>
             </ul>
             <div class="mobile-drawer-footer">
@@ -581,6 +597,72 @@
 }
 
 .mobile-drawer-footer { padding: 20px 24px; border-top: 1px solid #eee; }
+/* ─── ALLIANCES MEGA ────────────────────────────────────── */
+.alliances-mega {
+    border-bottom: 5px solid var(--primary);
+}
+.mega-title-simple {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--dark);
+    margin: 0;
+}
+.btn-view-all-brands {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--primary);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    background: var(--primary-soft);
+    border-radius: 50px;
+    transition: var(--transition-fast);
+}
+.btn-view-all-brands:hover {
+    background: var(--primary);
+    color: #fff !important;
+}
+
+.alliances-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 20px;
+}
+.mega-brand-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    border: 1.5px solid var(--border-light);
+    border-radius: 12px;
+    padding: 15px;
+    height: 80px;
+    transition: var(--transition);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+}
+.mega-brand-box:hover {
+    border-color: var(--primary);
+    box-shadow: 0 8px 25px rgba(3,138,107,0.12);
+    transform: translateY(-4px);
+}
+.mega-brand-box img {
+    max-height: 44px;
+    max-width: 130px;
+    object-fit: contain;
+    filter: grayscale(1);
+    opacity: 0.5;
+    transition: var(--transition);
+}
+.mega-brand-box:hover img {
+    filter: grayscale(0);
+    opacity: 1;
+}
+.mega-brand-text {
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
 </style>
 
 <script>

@@ -22,10 +22,10 @@ class FrontendController extends Controller
         $featuredProducts = Product::where('status', 1)->where('featured', 1)->take(8)->get();
         
         // Latest items for homepage sections
-        $latestCategories = Category::where('status', 1)->latest()->take(5)->get();
+        $latestCategories = Category::where('status', 1)->latest()->take(4)->get();
         $latestSubcategories = Subcategory::where('status', 1)->latest()->take(5)->get();
         $latestChildCategories = ChildCategory::where('status', 1)->latest()->take(5)->get();
-        $latestBrands = Brand::where('status', 1)->latest()->take(5)->get();
+        $latestBrands = Brand::where('status', 1)->latest()->take(4)->get();
         
         return view('frontend.index', compact(
             'categories', 
@@ -46,10 +46,17 @@ class FrontendController extends Controller
 
     public function categories()
     {
-        $categories = Category::with(['subcategories.childCategories'])->where('status', 1)->paginate(20);
+        $categories = Category::with(['subcategories' => function($q) {
+            $q->where('status', 1)->withCount('childCategories');
+        }])->where('status', 1)->paginate(30);
         return view('frontend.categories', compact('categories'));
     }
-
+    public function categorySubcategories($slug)
+    {
+        $category = Category::with(['subcategories.childCategories'])->where('slug', $slug)->firstOrFail();
+        $subcategories = $category->subcategories()->where('status', 1)->paginate(20);
+        return view('frontend.subcategories', compact('category', 'subcategories'));
+    }
     public function subcategories()
     {
         $subcategories = Subcategory::with(['category', 'childCategories'])->where('status', 1)->paginate(30);
@@ -95,6 +102,18 @@ class FrontendController extends Controller
         return view('frontend.products', compact('products', 'childCategory', 'brands', 'categories'));
     }
 
+    public function brandDetails($slug)
+    {
+        $brand = Brand::where('slug', $slug)->firstOrFail();
+        $brandProducts = Product::with(['images', 'category', 'brand'])
+            ->where('brand_id', $brand->id)
+            ->where('status', 1)
+            ->take(8)
+            ->get();
+        
+        return view('frontend.brand_details', compact('brand', 'brandProducts'));
+    }
+
     public function brandProducts($slug)
     {
         $brand = Brand::where('slug', $slug)->firstOrFail();
@@ -130,6 +149,48 @@ class FrontendController extends Controller
         $categories = Category::with('subcategories.childCategories')->where('status', 1)->get();
         
         return view('frontend.products', compact('products', 'brands', 'categories', 'query'));
+    }
+
+    public function partList(Request $request)
+    {
+        $query = $request->input('query');
+        $isAjax = $request->ajax();
+
+        if (!$query && !$isAjax) {
+            $products = collect();
+            $brands = Brand::where('status', 1)->get();
+            $categories = Category::with('subcategories.childCategories')->where('status', 1)->get();
+            return view('frontend.part_list', compact('products', 'brands', 'categories', 'query'));
+        }
+
+        $products = Product::with(['images', 'category', 'brand'])
+            ->where('status', 1);
+
+        if ($query) {
+            $products->where(function($q) use ($query) {
+                $q->where('name', 'LIKE', "%{$query}%")
+                  ->orWhere('part_code', 'LIKE', "%{$query}%")
+                  ->orWhere('short_description', 'LIKE', "%{$query}%")
+                  ->orWhere('tags', 'LIKE', "%{$query}%");
+            });
+        } else {
+            // If AJAX but no query, maybe return empty or all?
+            // User said "by default no product", so if no query, return empty.
+            if ($isAjax) {
+                $products->where('id', 0); // Force empty
+            }
+        }
+
+        $products = $products->paginate(20);
+
+        if ($isAjax) {
+            return view('frontend.components.part_results_table', compact('products'))->render();
+        }
+            
+        $brands = Brand::where('status', 1)->get();
+        $categories = Category::with('subcategories.childCategories')->where('status', 1)->get();
+        
+        return view('frontend.part_list', compact('products', 'brands', 'categories', 'query'));
     }
 
     public function enquirySubmit(Request $request)

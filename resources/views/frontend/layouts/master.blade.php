@@ -4,7 +4,8 @@
     @php $settings = \App\Models\Setting::first(); @endphp
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="@yield('meta_description', 'Siddharsh — Enterprise IT Infrastructure & Networking Solutions. Explore our complete catalog of brands, categories and products.')">
+    <meta name="description" content="@yield('meta_description', $settings->meta_description ?? 'Siddharsh — Enterprise IT Infrastructure & Networking Solutions.')">
+    <meta name="keywords" content="@yield('meta_keywords', $settings->meta_keywords ?? 'it infrastructure, networking, siddharsh')">
     <meta name="robots" content="index, follow">
     <title>@yield('title', ($settings->site_title ?? 'Siddharsh') . ' — Enterprise IT Infrastructure')</title>
 
@@ -263,6 +264,7 @@
             font-size: 0.78rem;
             font-weight: 500;
             margin-bottom: 0;
+            justify-content: center; /* Center breadcrumbs */
         }
         .breadcrumb-item + .breadcrumb-item::before {
             content: "›";
@@ -276,10 +278,19 @@
            PAGE HEADER BANNER
         ============================================ */
         .page-banner {
-            background: linear-gradient(135deg, var(--dark) 0%, var(--dark-3) 60%, #0a2b1e 100%);
-            padding: 56px 0;
+            background: linear-gradient(rgba(12, 26, 20, 0.85), rgba(12, 26, 20, 0.85)), 
+                        url('https://images.unsplash.com/photo-1558494949-ef010cbdcc51?auto=format&fit=crop&w=1920&q=80') !important;
+            background-size: cover !important;
+            background-position: center !important;
+            background-attachment: fixed; /* Optional: adds a parallax-like feel */
+            padding: 80px 0;
             position: relative;
             overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            min-height: 280px; /* Standardized Height */
         }
         .page-banner::before {
             content: '';
@@ -288,8 +299,9 @@
             right: -10%;
             width: 500px;
             height: 500px;
-            background: radial-gradient(circle, rgba(3,138,107,0.15) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(3,138,107,0.2) 0%, transparent 70%);
             pointer-events: none;
+            z-index: 1;
         }
         .page-banner::after {
             content: '';
@@ -298,15 +310,34 @@
             left: -5%;
             width: 300px;
             height: 300px;
-            background: radial-gradient(circle, rgba(3,138,107,0.08) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(3,138,107,0.12) 0%, transparent 70%);
             pointer-events: none;
+            z-index: 1;
         }
+        .page-banner .container { position: relative; z-index: 2; }
         .page-banner .breadcrumb-item a { color: rgba(255,255,255,0.6); }
         .page-banner .breadcrumb-item a:hover { color: var(--primary-light); }
         .page-banner .breadcrumb-item.active { color: var(--primary-light); }
         .page-banner .breadcrumb-item + .breadcrumb-item::before { color: rgba(255,255,255,0.3); }
-        .page-banner h1 { color: #fff; }
-        .page-banner .page-banner-sub { color: rgba(255,255,255,0.6); font-size: 0.95rem; }
+        .page-banner h1 { 
+            color: #fff; 
+            margin: 15px 0;
+            font-size: clamp(2.2rem, 5vw, 3.2rem); 
+            font-weight: 800;
+        }
+        .page-banner .page-banner-sub { 
+            color: rgba(255,255,255,0.7); 
+            font-size: 1.1rem; 
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        .page-banner .section-label { 
+            display: inline-flex; 
+            margin: 0 auto 20px;
+            background: rgba(3, 138, 107, 0.25);
+            border: 1px solid rgba(3, 138, 107, 0.3);
+            color: #7fffd4;
+        }
 
         /* ============================================
            PAGINATION
@@ -514,9 +545,156 @@
         #backToTop.visible { opacity: 1; visibility: visible; }
         #backToTop:hover { background: var(--primary-dark); transform: translateY(-3px); }
 
+        /* ─── PREMIUM CARD DESIGN (GREEN BOX) ────────── */
+        .brand-premium-card {
+            background: #fff;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.08); /* More visible shadow */
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid rgba(0,0,0,0.04);
+        }
+        .brand-premium-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 25px 50px rgba(3,138,107,0.18); /* Stronger hover shadow */
+        }
+        .brand-card-top {
+            height: 160px; /* Reduced default height */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: #fff;
+            position: relative;
+        }
+        .brand-card-main-img {
+            max-width: 90%; /* Increased from 80% */
+            max-height: 90%; /* Increased from 80% */
+            object-fit: contain;
+            transition: transform 0.5s ease;
+        }
+        .brand-premium-card:hover .brand-card-main-img {
+            transform: scale(1.08);
+        }
+        .brand-card-placeholder-img {
+            width: 100px;
+            height: 100px;
+            background: #f8fafb;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+        .brand-card-bottom-box {
+            background: #038a6b;
+            padding: 20px 15px;
+            text-align: center;
+            margin-top: auto;
+            border-radius: 15px;
+            margin: 0 15px 15px; /* Inset margins */
+            transition: background 0.3s ease;
+        }
+        .brand-premium-card:hover .brand-card-bottom-box {
+            background: #026d54;
+        }
+        .brand-card-heading {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -0.01em;
+            line-height: 1.2;
+            color: #fff;
+        }
+        .brand-card-desc {
+            font-size: 0.78rem;
+            line-height: 1.5;
+            margin-bottom: 20px;
+            opacity: 0.85;
+            display: -webkit-box;
+            -webkit-line-clamp: 2; /* Limit to 2 lines */
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            height: 2.35rem; /* Consistent height for 2 lines */
+        }
+        .brand-card-btn {
+            display: inline-block;
+            background: rgba(255,255,255,0.1);
+            color: #fff !important;
+            padding: 8px 24px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-decoration: none;
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.3s ease;
+        }
+        .brand-card-btn:hover {
+            background: #fff;
+            color: #038a6b !important;
+            transform: scale(1.05);
+        }
+
+        /* ─── BRAND CARD SMALL VARIANT ────────── */
+        .brand-card-small .brand-card-top {
+            height: 130px;
+            padding: 15px;
+        }
+        .brand-card-small .brand-card-bottom-box {
+            padding: 12px 10px;
+            margin: 0 10px 10px;
+        }
+        .brand-card-small .brand-card-heading {
+            font-size: 0.95rem;
+            margin-bottom: 5px;
+        }
+        .brand-card-small .brand-card-btn {
+            padding: 6px 16px;
+            font-size: 0.72rem;
+        }
+
         @media (max-width: 768px) {
             .section-py  { padding-top: 60px; padding-bottom: 60px; }
             .section-py-sm { padding-top: 40px; padding-bottom: 40px; }
+        }
+
+        /* ─── CATEGORY CARD ENHANCEMENTS ────────── */
+        .category-card-premium {
+            box-shadow: 0 15px 35px rgba(0,0,0,0.06) !important;
+            background: #fff !important;
+        }
+        .category-card-top {
+            padding: 30px !important; 
+            height: 220px !important;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .category-card-img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain; /* Match image behavior */
+            transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+        .category-card-premium:hover .category-card-img {
+            transform: scale(1.1);
+        }
+        .brand-card-desc {
+            font-size: 0.82rem;
+            line-height: 1.5;
+            margin-bottom: 0;
+            color: rgba(255,255,255,0.75);
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            height: auto;
         }
     </style>
 

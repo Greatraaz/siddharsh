@@ -18,6 +18,7 @@ class Product extends Model
         'child_category_id',
         'name',
         'slug',
+        'part_code',
         'thumbnail',
 
         'short_description',
@@ -30,6 +31,10 @@ class Product extends Model
 
         'featured',
         'status',
+
+        'meta_title',
+        'meta_description',
+        'meta_keywords',
 
     ];
 

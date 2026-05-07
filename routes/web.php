@@ -26,12 +26,15 @@ Route::get('/brands', [FrontendController::class, 'brands'])->name('brands');
 Route::get('/categories', [FrontendController::class, 'categories'])->name('categories');
 Route::get('/sub-categories', [FrontendController::class, 'subcategories'])->name('subcategories');
 Route::get('/child-categories', [FrontendController::class, 'childCategories'])->name('childcategories');
-Route::get('/category/{slug}', [FrontendController::class, 'categoryProducts'])->name('category.products');
+Route::get('/category/{slug}', [FrontendController::class, 'categorySubcategories'])->name('category.subcategories');
+Route::get('/category-products/{slug}', [FrontendController::class, 'categoryProducts'])->name('category.products');
 Route::get('/subcategory/{slug}', [FrontendController::class, 'subcategoryProducts'])->name('subcategory.products');
 Route::get('/child-category/{slug}', [FrontendController::class, 'childCategoryProducts'])->name('childcategory.products');
 Route::get('/product/{slug}', [FrontendController::class, 'productDetails'])->name('product.details');
-Route::get('/brand/{slug}', [FrontendController::class, 'brandProducts'])->name('brand.products');
+Route::get('/brand/{slug}', [FrontendController::class, 'brandDetails'])->name('brand.details');
+Route::get('/brand/{slug}/products', [FrontendController::class, 'brandProducts'])->name('brand.products');
 Route::get('/search', [FrontendController::class, 'search'])->name('search');
+Route::get('/part-list', [FrontendController::class, 'partList'])->name('part.list');
 Route::post('/enquiry/submit', [FrontendController::class, 'enquirySubmit'])->name('enquiry.submit');
 Route::get('/thank-you', [FrontendController::class, 'thankYou'])->name('thank.you');
 
@@ -121,7 +124,9 @@ Route::prefix('admin')
         |--------------------------------------------------------------------------
         */
 
+        Route::get('/products/export', [ProductController::class, 'export'])->name('products.export');
         Route::resource('products', ProductController::class);
+        Route::delete('/product-images/{id}', [ProductController::class, 'deleteImage'])->name('product-images.destroy');
 
         /*
         |--------------------------------------------------------------------------

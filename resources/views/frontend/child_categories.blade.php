@@ -7,18 +7,18 @@
 
 {{-- Page Banner --}}
 <section class="page-banner">
-    <div class="container position-relative" style="z-index:2;">
+    <div class="container">
         <nav aria-label="breadcrumb">
-            <ol class="breadcrumb mb-3">
+            <ol class="breadcrumb mb-2 justify-content-center">
                 <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
                 <li class="breadcrumb-item"><a href="{{ route('categories') }}">Categories</a></li>
                 <li class="breadcrumb-item"><a href="{{ route('subcategories') }}">Sub Categories</a></li>
-                <li class="breadcrumb-item active">Child Categories</li>
+                <li class="breadcrumb-item active fw-700">Child Categories</li>
             </ol>
         </nav>
-        <span class="section-label" style="background:rgba(3,138,107,0.2);color:var(--primary-light);">Detailed Hierarchy</span>
-        <h1 class="section-title text-white mt-2">Child Categories</h1>
-        <p class="page-banner-sub mt-2">Find precise product classifications</p>
+        <div class="banner-content">
+            <h1 class="mb-0">Child Categories</h1>
+        </div>
     </div>
 </section>
 

@@ -1,28 +1,27 @@
 @extends('frontend.layouts.master')
 
-@section('title', $product->name . ' — ' . ($settings->site_title ?? 'Siddharsh'))
-@section('meta_description', strip_tags($product->short_description ?? 'View detailed specifications and information for ' . $product->name))
+@php $settings = \App\Models\Setting::first(); @endphp
+@section('title', ($product->meta_title ?: $product->name) . ' — ' . ($settings->site_title ?? 'Siddharsh'))
+@section('meta_description', $product->meta_description ?: strip_tags($product->short_description ?? 'View detailed specifications and information for ' . $product->name))
+@section('meta_keywords', $product->meta_keywords ?: $product->tags)
 
 @section('content')
 
 {{-- ── Breadcrumb Banner ─────────────────────────────── --}}
-<section class="page-banner" style="padding:40px 0;">
-    <div class="container position-relative" style="z-index:2;">
+<section class="page-banner">
+    <div class="container">
         <nav aria-label="breadcrumb">
-            <ol class="breadcrumb mb-0">
+            <ol class="breadcrumb mb-2 justify-content-center">
                 <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
                 @if($product->category)
                 <li class="breadcrumb-item"><a href="{{ route('category.products', $product->category->slug) }}">{{ $product->category->name }}</a></li>
                 @endif
-                @if($product->subcategory)
-                <li class="breadcrumb-item"><a href="{{ route('subcategory.products', $product->subcategory->slug) }}">{{ $product->subcategory->name }}</a></li>
-                @endif
-                @if($product->childCategory)
-                <li class="breadcrumb-item"><a href="{{ route('childcategory.products', $product->childCategory->slug) }}">{{ $product->childCategory->name }}</a></li>
-                @endif
-                <li class="breadcrumb-item active">{{ Str::limit($product->name, 40) }}</li>
+                <li class="breadcrumb-item active fw-700">Product Details</li>
             </ol>
         </nav>
+        <div class="banner-content">
+            <h1 class="mb-0">{{ $product->name }}</h1>
+        </div>
     </div>
 </section>
 
@@ -53,7 +52,10 @@
                         @php $thumbs->push(['src' => asset('uploads/products/'.$product->thumbnail), 'alt' => $product->name]); @endphp
                     @endif
                     @foreach($product->images as $img)
-                        @php $thumbs->push(['src' => asset('uploads/products/'.$img->image), 'alt' => $product->name]); @endphp
+                        @php 
+                            $galleryPath = 'uploads/products/gallery/' . $img->image;
+                            $thumbs->push(['src' => asset($galleryPath), 'alt' => $product->name]); 
+                        @endphp
                     @endforeach
 
                     @if($thumbs->count() > 1)
@@ -112,16 +114,34 @@
                     </div>
                     @endif
 
+                    {{-- Quick Specs Box --}}
+                    <div class="pd-quick-specs mb-4">
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <div class="pd-qs-item">
+                                    <span class="pd-qs-label">Part No.</span>
+                                    <span class="pd-qs-val">{{ strtoupper(substr($product->slug, 0, 8)) }}</span>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="pd-qs-item">
+                                    <span class="pd-qs-label">Status</span>
+                                    <span class="pd-qs-val text-primary">In Stock</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     {{-- Inquiry CTA --}}
-                    <div class="pd-cta-box">
-                        <p class="pd-cta-label">Interested in this product?</p>
+                    <div class="pd-cta-box shadow-sm">
+                        <p class="pd-cta-label">Direct Corporate Inquiry</p>
                         <button type="button" 
                                 class="btn btn-primary w-100 justify-content-center pd-inquiry-btn"
                                 data-bs-toggle="modal" 
                                 data-bs-target="#enquiryModal">
-                            <i class="fas fa-paper-plane"></i> Send Inquiry
+                            <i class="fas fa-paper-plane"></i> Get a Business Quote
                         </button>
-                        <p class="pd-cta-note"><i class="fas fa-clock"></i> We typically respond within 24 hours</p>
+                        <p class="pd-cta-note"><i class="fas fa-bolt"></i> Fast Response Guarantee</p>
                     </div>
 
                     {{-- Trust badges --}}
@@ -501,13 +521,20 @@
 .pd-tab-pane { display: none; }
 .pd-tab-pane.active { display: block; }
 
-.pd-specs-table table { width: 100%; border-collapse: collapse; }
-.pd-specs-table tr { border-bottom: 1px solid var(--border-light); }
-.pd-specs-table tr:last-child { border-bottom: none; }
-.pd-specs-table td { padding: 14px 0; font-size: 0.88rem; color: var(--text-muted); vertical-align: top; }
-.pd-specs-table td:first-child { width: 38%; font-weight: 700; color: var(--text-main); padding-right: 20px; }
+.pd-specs-table table { width: 100%; border-collapse: separate; border-spacing: 0; }
+.pd-specs-table tr { background: #fff; transition: background 0.2s; }
+.pd-specs-table tr:nth-child(even) { background: #fbfcfc; }
+.pd-specs-table tr:hover { background: var(--primary-soft); }
+.pd-specs-table td { padding: 16px 20px; font-size: 0.88rem; color: var(--text-muted); border-bottom: 1px solid var(--border-light); vertical-align: middle; }
+.pd-specs-table td:first-child { width: 35%; font-weight: 700; color: var(--dark); border-right: 1px solid var(--border-light); }
+.pd-specs-table tr:last-child td { border-bottom: none; }
 
-.pd-tab-prose { font-size: 0.9rem; color: var(--text-muted); line-height: 1.9; }
+.pd-tab-prose { font-size: 0.95rem; color: var(--text-muted); line-height: 1.9; }
+
+.pd-quick-specs { background: #fff; border: 1px solid var(--border-light); border-radius: 12px; padding: 12px; }
+.pd-qs-item { display: flex; flex-direction: column; gap: 2px; padding: 8px 12px; background: var(--bg-light); border-radius: 8px; }
+.pd-qs-label { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; color: var(--text-light); letter-spacing: 0.05em; }
+.pd-qs-val { font-size: 0.85rem; font-weight: 800; color: var(--dark); }
 
 .pd-tab-empty {
     text-align: center;

@@ -80,6 +80,11 @@
                     @error('name') <small class="text-danger">{{ $message }}</small> @enderror
                 </div>
                 <div class="mb-3">
+                    <label>Part Code</label>
+                    <input type="text" name="part_code" class="form-control @error('part_code') is-invalid @enderror" value="{{ old('part_code', $product->part_code) }}" required>
+                    @error('part_code') <small class="text-danger">{{ $message }}</small> @enderror
+                </div>
+                <div class="mb-3">
                     <label>Product Title Tags</label>
                     <input type="text"
                            name="tags"
@@ -90,18 +95,40 @@
 
                 {{-- IMAGE --}}
                 <div class="mb-3">
-                    <label>Image</label>
-
+                    <label>Main Thumbnail</label>
                     @if($product->thumbnail)
                         <div class="mb-2">
                             <img src="{{ asset('uploads/products/'.$product->thumbnail) }}"
                                  width="80" height="80"
-                                 class="rounded">
+                                 class="rounded border">
                         </div>
                     @endif
-
-                    <input type="file" name="image" class="form-control @error('image') is-invalid @enderror">
+                    <input type="file" name="image" class="form-control @error('image') is-invalid @enderror" accept="image/*">
                     @error('image') <small class="text-danger">{{ $message }}</small> @enderror
+                </div>
+
+                <div class="mb-3">
+                    <label>Product Gallery (Multiple Images)</label>
+                    <div class="d-flex flex-wrap gap-2 mb-2">
+                        @foreach($product->images as $img)
+                            <div class="position-relative gallery-item-{{ $img->id }}">
+                                <img src="{{ asset('uploads/products/gallery/'.$img->image) }}"
+                                     width="80" height="80"
+                                     class="rounded border object-fit-cover">
+                                <button type="button" 
+                                        class="btn btn-danger btn-sm position-absolute top-0 end-0 p-0 rounded-circle delete-gallery-img" 
+                                        data-id="{{ $img->id }}"
+                                        style="width:20px; height:20px; line-height:1;">
+                                    &times;
+                                </button>
+                            </div>
+                        @endforeach
+                    </div>
+                    <input type="file" name="images[]" id="gallery-input" class="form-control @error('images.*') is-invalid @enderror" accept="image/*" multiple>
+                    <div id="gallery-preview" class="d-flex flex-wrap gap-2 mt-2"></div>
+                    @error('images.*')
+                        <small class="text-danger">{{ $message }}</small>
+                    @enderror
                 </div>
 
                 {{-- CKEDITOR FIELDS --}}
@@ -152,6 +179,24 @@
                         @error('featured') <small class="text-danger">{{ $message }}</small> @enderror
                     </div>
 
+                </div>
+
+                <hr class="my-4">
+                <h5 class="mb-3 text-primary">SEO Section</h5>
+
+                <div class="mb-3">
+                    <label>Meta Title</label>
+                    <input type="text" name="meta_title" value="{{ old('meta_title', $product->meta_title) }}" class="form-control">
+                </div>
+
+                <div class="mb-3">
+                    <label>Meta Description</label>
+                    <textarea name="meta_description" class="form-control" rows="3">{{ old('meta_description', $product->meta_description) }}</textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label>Meta Keywords</label>
+                    <textarea name="meta_keywords" class="form-control" rows="2" placeholder="keyword1, keyword2, ...">{{ old('meta_keywords', $product->meta_keywords) }}</textarea>
                 </div>
 
                 <button class="btn btn-primary px-4">Update Product</button>
@@ -221,6 +266,55 @@ $(document).ready(function() {
         } else {
             childcategoryDropdown.html('<option value="">Select Child Category</option>');
         }
+    });
+
+    // Gallery Preview
+    $('#gallery-input').on('change', function() {
+        var preview = $('#gallery-preview');
+        preview.html('');
+        if (this.files) {
+            $.each(this.files, function(i, file) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.append('<div class="position-relative"><img src="'+e.target.result+'" class="img-thumbnail" style="width:100px; height:100px; object-fit:cover;"></div>');
+                }
+                reader.readAsDataURL(file);
+            });
+        }
+    });
+
+    // Delete Gallery Image
+    $('.delete-gallery-img').on('click', function() {
+        var id = $(this).data('id');
+        var item = $('.gallery-item-' + id);
+        
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You want to delete this gallery image?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '{{ url("admin/product-images") }}/' + id,
+                    type: 'DELETE',
+                    data: {
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success: function(response) {
+                        item.remove();
+                        Swal.fire(
+                            'Deleted!',
+                            'Image has been deleted.',
+                            'success'
+                        )
+                    }
+                });
+            }
+        });
     });
 });
 </script>

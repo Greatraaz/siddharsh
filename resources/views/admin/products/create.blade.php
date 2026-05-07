@@ -89,9 +89,22 @@
                     <input type="text"
                            name="name"
                            value="{{ old('name') }}"
-                           class="form-control"
+                           class="form-control @error('name') is-invalid @enderror"
                            required>
                     @error('name')
+                        <small class="text-danger">{{ $message }}</small>
+                    @enderror
+                </div>
+
+                <div class="mb-3">
+                    <label>Part Code *</label>
+                    <input type="text"
+                           name="part_code"
+                           value="{{ old('part_code') }}"
+                           class="form-control @error('part_code') is-invalid @enderror"
+                           placeholder="Enter Unique Part Code"
+                           required>
+                    @error('part_code')
                         <small class="text-danger">{{ $message }}</small>
                     @enderror
                 </div>
@@ -107,9 +120,18 @@
                         @enderror
                 </div>
                 <div class="mb-3">
-                    <label>Image</label>
-                    <input type="file" name="image" class="form-control @error('image') is-invalid @enderror" accept="image/*">
+                    <label>Main Thumbnail *</label>
+                    <input type="file" name="image" class="form-control @error('image') is-invalid @enderror" accept="image/*" required>
                     @error('image')
+                        <small class="text-danger">{{ $message }}</small>
+                    @enderror
+                </div>
+
+                <div class="mb-3">
+                    <label>Product Gallery (Multiple Images)</label>
+                    <input type="file" name="images[]" id="gallery-input" class="form-control @error('images.*') is-invalid @enderror" accept="image/*" multiple>
+                    <div id="gallery-preview" class="d-flex flex-wrap gap-2 mt-2"></div>
+                    @error('images.*')
                         <small class="text-danger">{{ $message }}</small>
                     @enderror
                 </div>
@@ -162,6 +184,24 @@
                         @error('featured') <small class="text-danger">{{ $message }}</small> @enderror
                     </div>
 
+                </div>
+
+                <hr class="my-4">
+                <h5 class="mb-3 text-primary">SEO Section</h5>
+
+                <div class="mb-3">
+                    <label>Meta Title</label>
+                    <input type="text" name="meta_title" value="{{ old('meta_title') }}" class="form-control">
+                </div>
+
+                <div class="mb-3">
+                    <label>Meta Description</label>
+                    <textarea name="meta_description" class="form-control" rows="3">{{ old('meta_description') }}</textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label>Meta Keywords</label>
+                    <textarea name="meta_keywords" class="form-control" rows="2" placeholder="keyword1, keyword2, ...">{{ old('meta_keywords') }}</textarea>
                 </div>
 
                 <button class="btn btn-primary px-4">
@@ -232,6 +272,21 @@ $(document).ready(function() {
             });
         } else {
             childcategoryDropdown.html('<option value="">Select Child Category</option>');
+        }
+    });
+
+    // Gallery Preview
+    $('#gallery-input').on('change', function() {
+        var preview = $('#gallery-preview');
+        preview.html('');
+        if (this.files) {
+            $.each(this.files, function(i, file) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.append('<div class="position-relative"><img src="'+e.target.result+'" class="img-thumbnail" style="width:100px; height:100px; object-fit:cover;"></div>');
+                }
+                reader.readAsDataURL(file);
+            });
         }
     });
 });

@@ -9,6 +9,7 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Subcategory;
 use App\Models\ChildCategory;
+use App\Models\ProductImage;
 use Illuminate\Support\Str;
 
 class ProductController extends Controller
@@ -59,8 +60,10 @@ class ProductController extends Controller
             'child_category_id' => 'nullable|exists:child_categories,id',
 
             'name'           => 'required|string|max:255|unique:products,name',
+            'part_code'      => 'required|string|max:255|unique:products,part_code',
 
             'image'          => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'images.*'       => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
 
             'short_description' => 'nullable|string',
             'specifications'    => 'nullable|string',
@@ -71,6 +74,10 @@ class ProductController extends Controller
 
             'status'         => 'required|in:0,1',
             'featured'       => 'nullable|in:0,1',
+
+            'meta_title'     => 'nullable|string|max:255',
+            'meta_description' => 'nullable|string',
+            'meta_keywords'  => 'nullable|string',
 
         ]);
 
@@ -84,7 +91,7 @@ class ProductController extends Controller
         }
 
         // CREATE PRODUCT
-        Product::create([
+        $product = Product::create([
 
             'brand_id'           => $request->brand_id,
             'category_id'        => $request->category_id,
@@ -93,6 +100,7 @@ class ProductController extends Controller
 
             'name'               => $request->name,
             'slug'               => Str::slug($request->name),
+            'part_code'          => $request->part_code,
 
             'thumbnail'          => $imageName,
 
@@ -106,7 +114,24 @@ class ProductController extends Controller
             'featured'           => $request->featured ?? 0,
             'status'             => $request->status,
 
+            'meta_title'         => $request->meta_title,
+            'meta_description'   => $request->meta_description,
+            'meta_keywords'      => $request->meta_keywords,
+
         ]);
+
+        // MULTIPLE IMAGES UPLOAD
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $file) {
+                $multiImageName = time() . '_' . uniqid() . '_' . $file->getClientOriginalName();
+                $file->move(public_path('uploads/products/gallery'), $multiImageName);
+
+                ProductImage::create([
+                    'product_id' => $product->id,
+                    'image'      => $multiImageName,
+                ]);
+            }
+        }
 
         return redirect()
             ->route('admin.products.index')
@@ -155,8 +180,10 @@ class ProductController extends Controller
             'child_category_id' => 'nullable|exists:child_categories,id',
 
             'name'           => 'required|unique:products,name,'.$product->id,
+            'part_code'      => 'required|unique:products,part_code,'.$product->id,
 
             'image'          => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'images.*'       => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
 
             'short_description' => 'nullable|string',
             'specifications'    => 'nullable|string',
@@ -167,6 +194,10 @@ class ProductController extends Controller
 
             'status'         => 'required|in:0,1',
             'featured'       => 'nullable|in:0,1',
+
+            'meta_title'     => 'nullable|string|max:255',
+            'meta_description' => 'nullable|string',
+            'meta_keywords'  => 'nullable|string',
 
         ]);
 
@@ -194,6 +225,7 @@ class ProductController extends Controller
 
             'name'               => $request->name,
             'slug'               => Str::slug($request->name),
+            'part_code'          => $request->part_code,
 
             'thumbnail'          => $imageName,
 
@@ -208,7 +240,24 @@ class ProductController extends Controller
             'featured'           => $request->featured ?? 0,
             'status'             => $request->status,
 
+            'meta_title'         => $request->meta_title,
+            'meta_description'   => $request->meta_description,
+            'meta_keywords'      => $request->meta_keywords,
+
         ]);
+
+        // MULTIPLE IMAGES UPLOAD
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $file) {
+                $multiImageName = time() . '_' . uniqid() . '_' . $file->getClientOriginalName();
+                $file->move(public_path('uploads/products/gallery'), $multiImageName);
+
+                ProductImage::create([
+                    'product_id' => $product->id,
+                    'image'      => $multiImageName,
+                ]);
+            }
+        }
 
         return redirect()
             ->route('admin.products.index')
@@ -226,10 +275,67 @@ class ProductController extends Controller
             unlink(public_path('uploads/products/'.$product->thumbnail));
         }
 
+        foreach ($product->images as $image) {
+            if (file_exists(public_path('uploads/products/gallery/' . $image->image))) {
+                unlink(public_path('uploads/products/gallery/' . $image->image));
+            }
+            $image->delete();
+        }
+
         $product->delete();
 
         return redirect()
             ->route('admin.products.index')
             ->with('success', 'Product Deleted Successfully');
+    }
+
+    public function deleteImage($id)
+    {
+        $image = ProductImage::findOrFail($id);
+        
+        if (file_exists(public_path('uploads/products/gallery/' . $image->image))) {
+            unlink(public_path('uploads/products/gallery/' . $image->image));
+        }
+
+        $image->delete();
+
+        return response()->json(['success' => 'Image Deleted Successfully']);
+    }
+
+    public function export()
+    {
+        $products = Product::with(['brand', 'category', 'subcategory'])->get();
+        $filename = "products-export-" . date('Y-m-d-H-i-s') . ".csv";
+        $headers = [
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=$filename",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        ];
+
+        $columns = ['#', 'Name', 'Part Code', 'Brand', 'Category', 'Subcategory', 'Status', 'Created At'];
+
+        $callback = function() use($products, $columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+
+            foreach ($products as $key => $product) {
+                $row['#']           = $key + 1;
+                $row['Name']        = $product->name;
+                $row['Part Code']   = $product->part_code;
+                $row['Brand']       = $product->brand->name ?? 'N/A';
+                $row['Category']    = $product->category->name ?? 'N/A';
+                $row['Subcategory'] = $product->subcategory->name ?? 'N/A';
+                $row['Status']      = $product->status == 1 ? 'Active' : 'Inactive';
+                $row['Created At']  = $product->created_at;
+
+                fputcsv($file, array_values($row));
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 }
