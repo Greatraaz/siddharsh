@@ -140,6 +140,12 @@
                 </div>
 
                 <div class="mb-3">
+                    <label>Full Description</label>
+                    <textarea name="full_description" class="form-control editor @error('full_description') is-invalid @enderror">{{ old('full_description', $product->full_description) }}</textarea>
+                    @error('full_description') <small class="text-danger">{{ $message }}</small> @enderror
+                </div>
+
+                <div class="mb-3">
                     <label>Specifications</label>
                     <textarea name="specifications" class="form-control editor @error('specifications') is-invalid @enderror">{{ old('specifications', $product->specifications) }}</textarea>
                     @error('specifications') <small class="text-danger">{{ $message }}</small> @enderror

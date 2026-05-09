@@ -10,6 +10,9 @@
             <p class="text-muted mb-0">Manage all products</p>
         </div>
         <div class="d-flex gap-2">
+            <a href="{{ route('admin.products.import') }}" class="btn btn-outline-primary rounded-pill px-4">
+                <i class="fa-solid fa-file-import me-1"></i> Import
+            </a>
             <a href="{{ route('admin.products.export') }}" class="btn btn-success rounded-pill px-4">
                 <i class="fa-solid fa-file-excel me-1"></i> Export
             </a>

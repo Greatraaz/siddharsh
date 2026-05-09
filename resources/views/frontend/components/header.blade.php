@@ -461,7 +461,7 @@
     min-height: 400px;
 }
 
-.mega-col { padding: 0; }
+.mega-col { padding: 0; max-height: 480px; overflow-y: auto; }
 .mega-col-cats  { background: #f9f9f9; border-right: 1px solid var(--border-light); }
 .mega-col-subs  { background: #fff; border-right: 1px solid var(--border-light); }
 .mega-col-children { background: #fcfcfc; }

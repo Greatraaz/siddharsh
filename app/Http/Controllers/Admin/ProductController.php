@@ -2,15 +2,25 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Exports\ProductsExport;
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Jobs\ProductImportJob;
 use App\Models\Product;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Subcategory;
 use App\Models\ChildCategory;
 use App\Models\ProductImage;
+use App\Models\ProductImportLog;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Maatwebsite\Excel\Facades\Excel;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use ZipArchive;
 
 class ProductController extends Controller
 {
@@ -66,6 +76,7 @@ class ProductController extends Controller
             'images.*'       => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
 
             'short_description' => 'nullable|string',
+            'full_description'  => 'nullable|string',
             'specifications'    => 'nullable|string',
 
             'tags'           => 'nullable|string',
@@ -105,6 +116,7 @@ class ProductController extends Controller
             'thumbnail'          => $imageName,
 
             'short_description'  => $request->short_description,
+            'full_description'   => $request->full_description,
             'specifications'     => $request->specifications,
 
             'tags'               => $request->tags,
@@ -186,6 +198,7 @@ class ProductController extends Controller
             'images.*'       => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
 
             'short_description' => 'nullable|string',
+            'full_description'  => 'nullable|string',
             'specifications'    => 'nullable|string',
 
             'tags'           => 'nullable|string',
@@ -230,6 +243,7 @@ class ProductController extends Controller
             'thumbnail'          => $imageName,
 
             'short_description'  => $request->short_description,
+            'full_description'   => $request->full_description,
             'specifications'     => $request->specifications,
 
             'tags'               => $request->tags,
@@ -302,40 +316,172 @@ class ProductController extends Controller
         return response()->json(['success' => 'Image Deleted Successfully']);
     }
 
-    public function export()
+    public function importPage()
     {
-        $products = Product::with(['brand', 'category', 'subcategory'])->get();
-        $filename = "products-export-" . date('Y-m-d-H-i-s') . ".csv";
+        return view('admin.products.import');
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'excel' => 'required|file|mimes:xlsx|max:51200',
+            'zip' => 'required|file|mimes:zip|max:512000',
+        ]);
+
+        $log = ProductImportLog::create([
+            'filename' => $request->file('excel')->getClientOriginalName(),
+            'status' => 'pending',
+            'errors' => [],
+        ]);
+
+        $base = 'imports/'.$log->id;
+
+        try {
+            $request->file('excel')->storeAs($base, 'products.xlsx');
+            $zipRelative = $request->file('zip')->storeAs($base, 'images.zip');
+
+            $extractDir = Storage::disk('local')->path($base.'/images');
+            File::ensureDirectoryExists($extractDir);
+
+            $zipPath = Storage::disk('local')->path($zipRelative);
+            $zip = new ZipArchive;
+            if ($zip->open($zipPath) !== true) {
+                throw new \RuntimeException('Could not open the ZIP archive.');
+            }
+            $zip->extractTo($extractDir);
+            $zip->close();
+        } catch (\Throwable $e) {
+            Storage::disk('local')->deleteDirectory($base);
+            $log->delete();
+
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 422);
+        }
+
+        ProductImportJob::dispatch($log->id);
+
+        // Automatically start a background worker to process the job
+        $artisanPath = base_path('artisan');
+        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            pclose(popen("start /B php \"$artisanPath\" queue:work --stop-when-empty", "r"));
+        } else {
+            exec("php \"$artisanPath\" queue:work --stop-when-empty > /dev/null 2>&1 &");
+        }
+
+        return response()->json([
+            'success' => true,
+            'import_log_id' => $log->id,
+        ]);
+    }
+
+    public function importStatus(string $id)
+    {
+        $log = ProductImportLog::findOrFail($id);
+        $processed = $log->imported_rows + $log->skipped_rows;
+        $percent = $log->total_rows > 0
+            ? (int) min(100, round(($processed / $log->total_rows) * 100))
+            : null;
+
+        return response()->json([
+            'id' => $log->id,
+            'status' => $log->status,
+            'total_rows' => $log->total_rows,
+            'imported_rows' => $log->imported_rows,
+            'skipped_rows' => $log->skipped_rows,
+            'errors' => $log->errors ?? [],
+            'percent' => $percent,
+            'started_at' => $log->started_at,
+            'completed_at' => $log->completed_at,
+        ]);
+    }
+
+    public function downloadTemplate()
+    {
+        $spreadsheet = new Spreadsheet;
+        $sheet = $spreadsheet->getActiveSheet();
+
         $headers = [
-            "Content-type"        => "text/csv",
-            "Content-Disposition" => "attachment; filename=$filename",
-            "Pragma"              => "no-cache",
-            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
-            "Expires"             => "0"
+            'brand',
+            'category',
+            'sub_category',
+            'child_category',
+            'name',
+            'slug',
+            'part_code',
+            'thumbnail',
+            'gallery_images',
+            'tags',
+            'short_description',
+            'full_description',
+            'specifications',
+            'packaging',
+            'additional_info',
+            'featured',
+            'meta_title',
+            'meta_description',
+            'meta_keywords',
+            'status',
         ];
 
-        $columns = ['#', 'Name', 'Part Code', 'Brand', 'Category', 'Subcategory', 'Status', 'Created At'];
+        $sample = [
+            'Acme Corp',
+            'Electronics',
+            'Mobile Phones',
+            'Smartphones',
+            'Sample product name',
+            '',
+            '',
+            'thumbnail.jpg',
+            'gallery-a.jpg, gallery-b.jpg',
+            'industrial, oem',
+            'Short description text',
+            'Longer full description for detail pages.',
+            'Size: 10mm; Material: Steel',
+            'Retail box',
+            'Optional notes',
+            1,
+            'Sample SEO title',
+            'Meta description for search engines.',
+            'keyword one, keyword two',
+            1,
+        ];
 
-        $callback = function() use($products, $columns) {
-            $file = fopen('php://output', 'w');
-            fputcsv($file, $columns);
+        $sheet->fromArray([$headers], null, 'A1');
+        $sheet->fromArray([$sample], null, 'A2');
 
-            foreach ($products as $key => $product) {
-                $row['#']           = $key + 1;
-                $row['Name']        = $product->name;
-                $row['Part Code']   = $product->part_code;
-                $row['Brand']       = $product->brand->name ?? 'N/A';
-                $row['Category']    = $product->category->name ?? 'N/A';
-                $row['Subcategory'] = $product->subcategory->name ?? 'N/A';
-                $row['Status']      = $product->status == 1 ? 'Active' : 'Inactive';
-                $row['Created At']  = $product->created_at;
+        $lastCol = 'T';
+        $sheet->getStyle('A1:'.$lastCol.'1')->applyFromArray([
+            'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID,
+                'startColor' => ['rgb' => '4F46E5'],
+            ],
+        ]);
 
-                fputcsv($file, array_values($row));
-            }
+        foreach (range('A', $lastCol) as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
 
-            fclose($file);
-        };
+        $path = tempnam(sys_get_temp_dir(), 'product-import-template');
+        if ($path === false) {
+            abort(500, 'Could not create temporary file.');
+        }
 
-        return response()->stream($callback, 200, $headers);
+        $writer = new Xlsx($spreadsheet);
+        $writer->save($path);
+        $spreadsheet->disconnectWorksheets();
+
+        return response()->download($path, 'product-import-template.xlsx', [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        ])->deleteFileAfterSend(true);
+    }
+
+    public function export()
+    {
+        $filename = 'products-export-'.date('Y-m-d-His').'.xlsx';
+
+        return Excel::download(new ProductsExport, $filename);
     }
 }

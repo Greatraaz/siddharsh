@@ -52,7 +52,7 @@
                         
                         @if($sub->childCategories->count())
                         <div class="d-flex flex-wrap gap-1 mb-4 mt-2">
-                            @foreach($sub->childCategories->take(3) as $child)
+                            @foreach($sub->childCategories->take(20) as $child)
                             <a href="{{ route('childcategory.products', $child->slug) }}" class="badge bg-black bg-opacity-25 text-white fw-600 border-0" style="font-size: 0.65rem; text-decoration: none; padding: 4px 10px; border-radius: 4px;">{{ $child->name }}</a>
                             @endforeach
                         </div>

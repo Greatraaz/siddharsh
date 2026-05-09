@@ -124,6 +124,10 @@ Route::prefix('admin')
         |--------------------------------------------------------------------------
         */
 
+        Route::get('/products/import/template', [ProductController::class, 'downloadTemplate'])->name('products.import.template');
+        Route::get('/products/import', [ProductController::class, 'importPage'])->name('products.import');
+        Route::post('/products/import', [ProductController::class, 'import'])->name('products.import.submit');
+        Route::get('/products/import/status/{id}', [ProductController::class, 'importStatus'])->name('products.import.status');
         Route::get('/products/export', [ProductController::class, 'export'])->name('products.export');
         Route::resource('products', ProductController::class);
         Route::delete('/product-images/{id}', [ProductController::class, 'deleteImage'])->name('product-images.destroy');

@@ -25,7 +25,7 @@ class FrontendController extends Controller
         $latestCategories = Category::where('status', 1)->latest()->take(4)->get();
         $latestSubcategories = Subcategory::where('status', 1)->latest()->take(5)->get();
         $latestChildCategories = ChildCategory::where('status', 1)->latest()->take(5)->get();
-        $latestBrands = Brand::where('status', 1)->latest()->take(4)->get();
+        $latestBrands = Brand::where('status', 1)->latest()->take(6)->get();
         
         return view('frontend.index', compact(
             'categories', 
