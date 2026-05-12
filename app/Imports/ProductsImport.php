@@ -116,52 +116,61 @@ class ProductsImport implements OnEachRow, WithChunkReading, SkipsEmptyRows, Wit
         $slug = $this->uniqueSlug($baseSlug);
 
         $partCodeCell = $this->stringValue($this->getCell($data, 'part_code'));
-        if ($partCodeCell !== '' && Product::withTrashed()->where('part_code', $partCodeCell)->exists()) {
-            $this->skipRow($rowIndex, 'Duplicate part_code already exists: '.$partCodeCell);
-
-            return;
-        }
-        $partCode = $partCodeCell !== '' ? $partCodeCell : $this->uniquePartCode();
-
-        if (Product::withTrashed()->where('name', $name)->exists()) {
-            $this->skipRow($rowIndex, 'Duplicate product name: '.$name);
-
-            return;
-        }
+        $productExists = Product::withTrashed()->where('name', $name)
+            ->when($partCodeCell !== '', function($q) use ($partCodeCell) {
+                return $q->orWhere('part_code', $partCodeCell);
+            })
+            ->first();
+        // We will update if it exists, or create if not.
 
         $dateStr = now()->format('dmY');
 
-        $thumbnail = $this->copyImageFromZip(
-            $this->stringValue($this->getCell($data, 'thumbnail')),
-            public_path('uploads/products'),
-            $slug . '_' . $dateStr . '_thumbnail'
-        );
+        $thumbCell = $this->stringValue($this->getCell($data, 'thumbnail'));
+        $thumbnail = null;
+        if ($thumbCell !== '') {
+            $thumbnail = $this->copyImageFromZip(
+                $thumbCell,
+                public_path('uploads/products'),
+                $slug . '_' . $dateStr . '_thumbnail'
+            );
+            if (!$thumbnail) {
+                $this->applyLogDelta(0, 0, [['row' => $rowIndex, 'message' => "Warning: Thumbnail image '{$thumbCell}' not found in ZIP archive."]]);
+            }
+        } elseif ($productExists && $productExists->thumbnail) {
+            $thumbnail = $productExists->thumbnail;
+        }
 
         $status = $this->parseBoolStatus($this->getCell($data, 'status'), true);
         $featured = $this->parseBoolStatus($this->getCell($data, 'featured'), false);
+        $isFuture = $this->parseBoolStatus($this->getCell($data, 'is_future', 'future'), false);
 
-        DB::transaction(function () use ($data, $brandId, $category, $subcategory, $childCategoryId, $name, $slug, $partCode, $thumbnail, $status, $featured, $dateStr) {
-            $product = Product::create([
-                'brand_id' => $brandId,
-                'category_id' => $category->id,
-                'subcategory_id' => $subcategory->id,
-                'child_category_id' => $childCategoryId,
-                'name' => $name,
-                'slug' => $slug,
-                'part_code' => $partCode,
-                'thumbnail' => $thumbnail,
-                'short_description' => $this->nullableString($this->getCell($data, 'short_description')),
-                'full_description' => $this->nullableString($this->getCell($data, 'full_description')),
-                'specifications' => $this->nullableString($this->getCell($data, 'specifications')),
-                'tags' => $this->nullableString($this->getCell($data, 'tags')),
-                'packaging' => $this->nullableString($this->getCell($data, 'packaging')),
-                'additional_info' => $this->nullableString($this->getCell($data, 'additional_info')),
-                'featured' => $featured,
-                'status' => $status,
-                'meta_title' => $this->nullableString($this->getCell($data, 'meta_title')),
-                'meta_description' => $this->nullableString($this->getCell($data, 'meta_description')),
-                'meta_keywords' => $this->nullableString($this->getCell($data, 'meta_keywords')),
-            ]);
+        DB::transaction(function () use ($data, $brandId, $category, $subcategory, $childCategoryId, $name, $slug, $partCodeCell, $thumbnail, $status, $featured, $dateStr, $isFuture, $productExists) {
+            $partCode = $partCodeCell !== '' ? $partCodeCell : ($productExists?->part_code ?? $this->uniquePartCode());
+            
+            $product = Product::updateOrCreate(
+                ['name' => $name],
+                [
+                    'brand_id' => $brandId,
+                    'category_id' => $category->id,
+                    'subcategory_id' => $subcategory->id,
+                    'child_category_id' => $childCategoryId,
+                    'slug' => $productExists?->slug ?? $slug,
+                    'part_code' => $partCode,
+                    'thumbnail' => $thumbnail,
+                    'short_description' => $this->nullableString($this->getCell($data, 'short_description')),
+                    'full_description' => $this->nullableString($this->getCell($data, 'full_description')),
+                    'specifications' => $this->nullableString($this->getCell($data, 'specifications')),
+                    'tags' => $this->nullableString($this->getCell($data, 'tags')),
+                    'packaging' => $this->nullableString($this->getCell($data, 'packaging')),
+                    'additional_info' => $this->nullableString($this->getCell($data, 'additional_info')),
+                    'featured' => $featured,
+                    'is_future' => $isFuture,
+                    'status' => $status,
+                    'meta_title' => $this->nullableString($this->getCell($data, 'meta_title')),
+                    'meta_description' => $this->nullableString($this->getCell($data, 'meta_description')),
+                    'meta_keywords' => $this->nullableString($this->getCell($data, 'meta_keywords')),
+                ]
+            );
 
             $galleryRaw = $this->stringValue($this->getCell($data, 'gallery_images', 'gallery'));
             if ($galleryRaw !== '') {

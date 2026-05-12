@@ -6,8 +6,8 @@
 
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
         <div>
-            <h3 class="fw-bold mb-1">Bulk import products</h3>
-            <p class="text-muted mb-0">Upload a spreadsheet and a ZIP of images. Processing runs in the background queue.</p>
+            <h3 class="fw-bold mb-1">Import Products</h3>
+            <p class="text-muted mb-0">Upload a spreadsheet (.xlsx) and a ZIP archive of product images. Processing runs in the background.</p>
         </div>
         <div class="d-flex flex-wrap gap-2">
             <a href="{{ route('admin.products.import.template') }}" class="btn btn-outline-primary rounded-pill px-4">
@@ -89,7 +89,7 @@
                             <span class="badge bg-primary rounded-circle me-2" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">2</span>
                             <span class="fw-bold">Fill Spreadsheet</span>
                         </div>
-                        <p class="small text-muted mb-0">Fill in product details. Brand, Category, and Subcategory names must match exactly with what's already in the system.</p>
+                        <p class="small text-muted mb-0">Fill in product details. Brand, Category, and Subcategory names must match exactly. <strong>If a product with the same name exists, it will be updated.</strong></p>
                     </div>
                     <div class="mb-3">
                         <div class="d-flex align-items-center mb-2">

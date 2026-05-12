@@ -501,7 +501,6 @@
     background: transparent;
     border: none;
     color: rgba(255,255,255,0.45);
-    font-family: 'Poppins', sans-serif;
     font-size: 0.82rem;
     font-weight: 600;
     padding: 12px 16px;

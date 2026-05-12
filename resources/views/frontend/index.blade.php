@@ -39,7 +39,7 @@
                 <div class="hero-overlay"></div>
                 <div class="container hero-content">
                     <div class="row">
-                        <div class="col-lg-8">
+                        <div class="col-lg-10">
                             <p class="hero-eyebrow">Unmatched Reliability</p>
                             <h1 class="hero-title" style="line-height: 1.1; font-weight: 900;">Secure & Scalable <br><span class="hero-highlight">Cloud Foundations</span></h1>
                             <p class="hero-sub">The backbone of your business deserves the best-in-class hardware and support.</p>
@@ -93,7 +93,7 @@
         </div>
         <div class="row g-4 mt-2">
             @foreach($latestCategories->take(4) as $i => $cat)
-            <div class="col-xl-3 col-lg-3 col-md-6 col-12">
+            <div class="col-xl-3 col-lg-3 col-md-6 col-6">
                 @include('frontend.components.category-card', ['category' => $cat])
             </div>
             @endforeach
@@ -278,7 +278,7 @@
     margin-bottom: 20px;
 }
 .hero-title {
-    font-size: clamp(2.6rem, 7vw, 4.5rem);
+    font-size: clamp(2rem, 5vw, 3.5rem);
     font-weight: 900;
     color: #fff;
     line-height: 1.05;
@@ -547,7 +547,7 @@
 .cta-sub {
     color: rgba(255,255,255,0.55);
     font-size: 0.95rem;
-    max-width: 480px;
+    max-width: 800px;
     margin-bottom: 0;
 }
 .btn-cta-outline {

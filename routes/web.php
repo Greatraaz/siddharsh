@@ -35,8 +35,16 @@ Route::get('/brand/{slug}', [FrontendController::class, 'brandDetails'])->name('
 Route::get('/brand/{slug}/products', [FrontendController::class, 'brandProducts'])->name('brand.products');
 Route::get('/search', [FrontendController::class, 'search'])->name('search');
 Route::get('/part-list', [FrontendController::class, 'partList'])->name('part.list');
+Route::get('/contact-us', [FrontendController::class, 'contact'])->name('contact');
 Route::post('/enquiry/submit', [FrontendController::class, 'enquirySubmit'])->name('enquiry.submit');
 Route::get('/thank-you', [FrontendController::class, 'thankYou'])->name('thank.you');
+Route::get('/future-products', [FrontendController::class, 'futureProducts'])->name('future.products');
+
+// AJAX routes for mega menu
+Route::get('/apisubcategories/{category_id}', [FrontendController::class, 'getApiSubcategories']);
+Route::get('/apichildcategories/{subcategory_id}', [FrontendController::class, 'getApiChildcategories']);
+Route::get('/apifeatured-products', [FrontendController::class, 'getApiFeaturedProducts']);
+
 
 /*
 |--------------------------------------------------------------------------
@@ -129,7 +137,10 @@ Route::prefix('admin')
         Route::post('/products/import', [ProductController::class, 'import'])->name('products.import.submit');
         Route::get('/products/import/status/{id}', [ProductController::class, 'importStatus'])->name('products.import.status');
         Route::get('/products/export', [ProductController::class, 'export'])->name('products.export');
+        
+
         Route::resource('products', ProductController::class);
+
         Route::delete('/product-images/{id}', [ProductController::class, 'deleteImage'])->name('product-images.destroy');
 
         /*

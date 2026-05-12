@@ -419,6 +419,7 @@ class ProductController extends Controller
             'packaging',
             'additional_info',
             'featured',
+            'is_future',
             'meta_title',
             'meta_description',
             'meta_keywords',
@@ -442,6 +443,7 @@ class ProductController extends Controller
             'Retail box',
             'Optional notes',
             1,
+            0,
             'Sample SEO title',
             'Meta description for search engines.',
             'keyword one, keyword two',
@@ -451,7 +453,7 @@ class ProductController extends Controller
         $sheet->fromArray([$headers], null, 'A1');
         $sheet->fromArray([$sample], null, 'A2');
 
-        $lastCol = 'T';
+        $lastCol = 'U';
         $sheet->getStyle('A1:'.$lastCol.'1')->applyFromArray([
             'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
             'fill' => [

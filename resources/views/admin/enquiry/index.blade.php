@@ -3,7 +3,7 @@
 @section('content')
 <div class="container-fluid px-4">
     <div class="d-flex justify-content-between align-items-center my-4">
-        <h1 class="h3 mb-0 text-gray-800">Product Enquiries</h1>
+        <h1 class="h3 mb-0 text-gray-800">All Customer Enquiries</h1>
     </div>
 
     @if(session('success'))
@@ -20,10 +20,10 @@
                     <thead class="bg-light">
                         <tr>
                             <th class="px-4 py-3">Status</th>
+                            <th class="py-3">Type</th>
                             <th class="py-3">Date</th>
                             <th class="py-3">Name</th>
-                            <th class="py-3">Email</th>
-                            <th class="py-3">Product</th>
+                            <th class="py-3">Details</th>
                             <th class="py-3 text-end px-4">Actions</th>
                         </tr>
                     </thead>
@@ -37,16 +37,29 @@
                                     <span class="badge bg-primary">New</span>
                                 @endif
                             </td>
-                            <td>{{ $enquiry->created_at->format('d M, Y h:i A') }}</td>
-                            <td>{{ $enquiry->name }}</td>
-                            <td>{{ $enquiry->email }}</td>
+                            <td>
+                                @if($enquiry->product_id)
+                                    <span class="badge bg-info-subtle text-info border border-info-subtle">Product</span>
+                                @elseif($enquiry->brand_id)
+                                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle">Brand</span>
+                                @else
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle">Contact</span>
+                                @endif
+                            </td>
+                            <td>{{ $enquiry->created_at->format('d M, Y') }}</td>
+                            <td>
+                                <div class="fw-bold">{{ $enquiry->name }}</div>
+                                <div class="small text-muted">{{ $enquiry->email }}</div>
+                            </td>
                             <td>
                                 @if($enquiry->product)
-                                    <a href="{{ route('product.details', $enquiry->product->slug) }}" target="_blank" class="text-decoration-none text-primary">
-                                        {{ Str::limit($enquiry->product->name, 30) }}
-                                    </a>
+                                    <div class="small fw-bold text-dark">Prod: {{ Str::limit($enquiry->product->name, 25) }}</div>
+                                @elseif($enquiry->brand)
+                                    <div class="small fw-bold text-dark">Brand: {{ $enquiry->brand->name }}</div>
+                                @elseif($enquiry->subject)
+                                    <div class="small fw-bold text-dark">Sub: {{ Str::limit($enquiry->subject, 25) }}</div>
                                 @else
-                                    <span class="text-muted">General</span>
+                                    <span class="text-muted small">No specific details</span>
                                 @endif
                             </td>
                             <td class="text-end px-4">

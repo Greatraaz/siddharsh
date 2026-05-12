@@ -97,7 +97,6 @@
     border: none;
     padding: 14px 16px 14px 42px;
     color: #fff;
-    font-family: 'Poppins', sans-serif;
     font-size: 0.88rem;
     width: 100%;
     outline: none;

@@ -50,16 +50,10 @@
                         </div>
                         <h3 class="brand-card-heading text-white mb-2" style="font-size: 1.1rem; font-weight: 800; line-height: 1.3;">{{ $sub->name }}</h3>
                         
-                        @if($sub->childCategories->count())
-                        <div class="d-flex flex-wrap gap-1 mb-4 mt-2">
-                            @foreach($sub->childCategories->take(20) as $child)
-                            <a href="{{ route('childcategory.products', $child->slug) }}" class="badge bg-black bg-opacity-25 text-white fw-600 border-0" style="font-size: 0.65rem; text-decoration: none; padding: 4px 10px; border-radius: 4px;">{{ $child->name }}</a>
-                            @endforeach
-                        </div>
-                        @endif
 
-                        <div class="mt-auto pt-3 border-top border-white border-opacity-10">
-                            <a href="{{ route('subcategory.products', $sub->slug) }}" class="btn btn-white btn-sm w-100 fw-800 py-2" style="font-size: 0.78rem; border-radius: 8px; color: var(--primary) !important;">
+
+                        <div class="mt-4">
+                            <a href="{{ route('subcategory.products', $sub->slug) }}" class="btn btn-white w-100 fw-800 py-2 d-flex align-items-center justify-content-center" style="font-size: 0.85rem; border-radius: 10px; background: #ffffff; color: var(--primary) !important; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
                                 View Products <i class="fas fa-arrow-right ms-2"></i>
                             </a>
                         </div>
@@ -103,6 +97,16 @@
 .brand-premium-card:hover {
     transform: translateY(-8px);
     box-shadow: 0 20px 40px rgba(0,0,0,0.1) !important;
+}
+.btn-white {
+    background-color: #ffffff !important;
+    color: var(--primary) !important;
+    transition: all 0.3s ease;
+}
+.btn-white:hover {
+    background-color: #f8f9fa !important;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2) !important;
 }
 </style>
 @endpush

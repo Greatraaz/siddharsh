@@ -135,30 +135,6 @@
     </div>
 </section>
 
-{{-- ─── 5. MAJOR CUSTOMERS ────────────────────────────────── --}}
-<section class="section-py bg-light-brand">
-    <div class="container text-center">
-        <h2 class="section-title mb-5 reveal">Some of Siddharsh Major Customers</h2>
-        <div class="row g-4 justify-content-center align-items-center reveal reveal-delay-2">
-            @php
-                $customers = [
-                    ['img' => 'https://upload.wikimedia.org/wikipedia/commons/b/b1/Tata_Consultancy_Services_Logo.svg', 'name' => 'TCS'],
-                    ['img' => 'https://upload.wikimedia.org/wikipedia/commons/0/05/Reliance_Industries_Logo.svg', 'name' => 'Reliance'],
-                    ['img' => 'https://upload.wikimedia.org/wikipedia/commons/9/95/Infosys_logo.svg', 'name' => 'Infosys'],
-                    ['img' => 'https://upload.wikimedia.org/wikipedia/commons/a/a0/Wipro_Primary_Logo_Color_RGB.svg', 'name' => 'Wipro'],
-                    ['img' => 'https://upload.wikimedia.org/wikipedia/commons/c/cd/Accenture.svg', 'name' => 'Accenture'],
-                ];
-            @endphp
-            @foreach($customers as $cust)
-            <div class="col-lg-2 col-md-3 col-6">
-                <div class="customer-logo-box">
-                    <img src="{{ $cust['img'] }}" alt="{{ $cust['name'] }}" class="img-fluid customer-logo-img">
-                </div>
-            </div>
-            @endforeach
-        </div>
-    </div>
-</section>
 
 {{-- ─── 6. CTA BANNER ──────────────────────────────────────── --}}
 <section class="section-py-sm bg-primary text-white text-center">

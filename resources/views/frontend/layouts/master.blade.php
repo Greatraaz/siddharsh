@@ -8,15 +8,19 @@
     <meta name="keywords" content="@yield('meta_keywords', $settings->meta_keywords ?? 'it infrastructure, networking, siddharsh')">
     <meta name="robots" content="index, follow">
     <title>@yield('title', ($settings->site_title ?? 'Siddharsh') . ' — Enterprise IT Infrastructure')</title>
+    
+    <script>
+        window.baseUrl = "{{ url('/') }}";
+    </script>
 
     @if($settings && $settings->favicon)
         <link rel="icon" type="image/png" href="{{ asset('uploads/settings/'.$settings->favicon) }}">
     @endif
 
-    <!-- Google Fonts: Poppins -->
+    <!-- Google Fonts: Outfit -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -81,19 +85,21 @@
         html { scroll-behavior: smooth; }
 
         body {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Outfit', sans-serif;
             color: var(--text-main);
             background-color: var(--bg-white);
             overflow-x: hidden;
-            line-height: 1.7;
+            line-height: 1.6;
+            font-size: 16px;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
 
         h1, h2, h3, h4, h5, h6 {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Outfit', sans-serif;
             color: var(--text-main);
-            line-height: 1.2;
+            line-height: 1.25;
+            font-weight: 800;
         }
 
         a { text-decoration: none; transition: var(--transition-fast); }
@@ -158,7 +164,7 @@
         }
 
         .section-title {
-            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            font-size: clamp(1.6rem, 3.5vw, 2.4rem);
             font-weight: 800;
             color: var(--text-main);
             letter-spacing: -0.02em;
@@ -169,8 +175,8 @@
            BUTTONS
         ============================================ */
         .btn {
-            font-family: 'Poppins', sans-serif;
-            font-weight: 600;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
             border-radius: var(--radius-sm);
             transition: var(--transition);
             border: 2px solid transparent;
@@ -278,19 +284,19 @@
            PAGE HEADER BANNER
         ============================================ */
         .page-banner {
-            background: linear-gradient(rgba(12, 26, 20, 0.85), rgba(12, 26, 20, 0.85)), 
-                        url('https://images.unsplash.com/photo-1558494949-ef010cbdcc51?auto=format&fit=crop&w=1920&q=80') !important;
+            background: linear-gradient(rgba(12, 26, 20, 0.7), rgba(12, 26, 20, 0.7)), 
+                        url('{{ asset('banner_11zon.webp') }}') !important;
             background-size: cover !important;
             background-position: center !important;
-            background-attachment: fixed; /* Optional: adds a parallax-like feel */
-            padding: 80px 0;
+            background-attachment: fixed;
+            padding: 100px 0;
             position: relative;
             overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
-            min-height: 280px; /* Standardized Height */
+            min-height: 350px;
         }
         .page-banner::before {
             content: '';
@@ -343,7 +349,7 @@
            PAGINATION
         ============================================ */
         .pagination .page-link {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Outfit', sans-serif;
             font-weight: 600;
             font-size: 0.85rem;
             color: var(--text-muted);
@@ -409,11 +415,11 @@
            FORM STYLES
         ============================================ */
         .form-control, .form-select {
-            font-family: 'Poppins', sans-serif;
-            font-size: 0.9rem;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
             border: 1.5px solid var(--border);
             border-radius: var(--radius-sm);
-            padding: 11px 16px;
+            padding: 12px 16px;
             color: var(--text-main);
             background: var(--bg-white);
             transition: var(--transition-fast);
@@ -592,24 +598,33 @@
             color: var(--primary);
         }
         .brand-card-bottom-box {
-            background: #038a6b;
-            padding: 20px 15px;
+            background: linear-gradient(135deg, #007e5e 0%, #006b50 100%);
+            padding: 24px 20px;
             text-align: center;
             margin-top: auto;
-            border-radius: 15px;
-            margin: 0 15px 15px; /* Inset margins */
-            transition: background 0.3s ease;
+            border-radius: 18px;
+            margin: 0 12px 12px;
+            transition: all 0.4s ease;
+            height: 70px; /* Reduced fixed height */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 20px rgba(0,126,94,0.15);
         }
         .brand-premium-card:hover .brand-card-bottom-box {
             background: #026d54;
         }
         .brand-card-heading {
-            font-size: 1.15rem;
+            font-size: 1rem;
             font-weight: 700;
-            margin-bottom: 8px;
+            margin-bottom: 0;
             letter-spacing: -0.01em;
-            line-height: 1.2;
+            line-height: 1.3;
             color: #fff;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
         .brand-card-desc {
             font-size: 0.78rem;
@@ -669,12 +684,14 @@
             background: #fff !important;
         }
         .category-card-top {
-            padding: 30px !important; 
-            height: 220px !important;
-            background: #fff;
+            padding: 20px !important; 
+            height: 150px !important;
+            background: #fdfdfd; /* Subtle off-white */
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
+            border-bottom: 1px solid #f5f5f5;
         }
         .category-card-img {
             max-width: 100%;
@@ -696,11 +713,68 @@
             overflow: hidden;
             height: auto;
         }
+
+        /* ============================================
+           PRELOADER
+        ============================================ */
+        #preloader {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: #fff;
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+        #preloader.loaded {
+            opacity: 0;
+            visibility: hidden;
+        }
+        .loader-inner {
+            text-align: center;
+        }
+        .loader-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--primary-soft);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        .loader-logo {
+            max-height: 60px;
+            width: auto;
+            animation: pulse 1.5s ease-in-out infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes pulse {
+            0% { transform: scale(0.95); opacity: 0.8; }
+            50% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(0.95); opacity: 0.8; }
+        }
     </style>
 
     @stack('styles')
 </head>
 <body>
+    <!-- Preloader -->
+    <div id="preloader">
+        <div class="loader-inner">
+            @if($settings && $settings->logo)
+                <img src="{{ asset('uploads/settings/'.$settings->logo) }}" alt="Logo" class="loader-logo">
+            @else
+                <div class="loader-spinner"></div>
+            @endif
+
+        </div>
+    </div>
 
     <!-- Search Overlay -->
     <div id="searchOverlay" role="dialog" aria-label="Search">
@@ -765,6 +839,15 @@
         closeBtn.addEventListener('click', () => overlay.classList.remove('active'));
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') overlay.classList.remove('active');
+        });
+
+        // ── Preloader ──────────────────────────────────────────────
+        window.addEventListener('load', () => {
+            const preloader = document.getElementById('preloader');
+            if (preloader) {
+                preloader.classList.add('loaded');
+                setTimeout(() => preloader.style.display = 'none', 500);
+            }
         });
     </script>
 

@@ -193,13 +193,20 @@ class FrontendController extends Controller
         return view('frontend.part_list', compact('products', 'brands', 'categories', 'query'));
     }
 
+    public function contact()
+    {
+        return view('frontend.contact');
+    }
+
     public function enquirySubmit(Request $request)
     {
         $request->validate([
-            'product_id' => 'required|exists:products,id',
+            'product_id' => 'nullable|exists:products,id',
+            'brand_id'   => 'nullable|exists:brands,id',
             'name'       => 'required|string|max:255',
             'email'      => 'required|email:rfc,dns|max:255',
             'phone'      => 'required|regex:/^[0-9]{10}$/',
+            'subject'    => 'nullable|string|max:255',
             'message'    => 'required|string',
         ], [
             'phone.regex' => 'Please enter a valid 10-digit phone number.',
@@ -224,5 +231,47 @@ class FrontendController extends Controller
     public function thankYou()
     {
         return view('frontend.thank_you');
+    }
+
+    public function getApiSubcategories($categoryId)
+    {
+        $subcategories = Subcategory::withCount('childCategories')
+            ->where('category_id', $categoryId)
+            ->where('status', 1)
+            ->get();
+            
+        return response()->json($subcategories);
+    }
+
+    public function getApiChildcategories($subcategoryId)
+    {
+        $childCategories = ChildCategory::where('subcategory_id', $subcategoryId)
+            ->where('status', 1)
+            ->get(['id', 'name', 'slug']);
+            
+        return response()->json($childCategories);
+    }
+
+    public function futureProducts()
+    {
+        $products = Product::with(['images', 'category', 'brand'])
+            ->where('is_future', 1)
+            ->where('status', 1)
+            ->paginate(12);
+            
+        $brands = Brand::where('status', 1)->get();
+        $categories = Category::where('status', 1)->get();
+        
+        $pageTitle = "Future Products";
+        
+        return view('frontend.products', compact('products', 'brands', 'categories', 'pageTitle'));
+    }
+    public function getApiFeaturedProducts()
+    {
+        $products = Product::where('featured', 1)
+            ->where('status', 1)
+            ->get(['id', 'name', 'slug']);
+            
+        return response()->json($products);
     }
 }

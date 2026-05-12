@@ -1,11 +1,12 @@
 @extends('frontend.layouts.master')
 
 @section('title',
+    (isset($pageTitle) ? $pageTitle :
     (isset($category) ? $category->name :
     (isset($subcategory) ? $subcategory->name :
     (isset($childCategory) ? $childCategory->name :
     (isset($brand) ? $brand->name :
-    (isset($query) ? 'Search: '.$query : 'All Products')))))
+    (isset($query) ? 'Search: '.$query : 'All Products'))))))
     . ' — ' . ($settings->site_title ?? 'Siddharsh')
 )
 
@@ -32,6 +33,8 @@
                 @elseif(isset($brand))
                     <li class="breadcrumb-item"><a href="{{ route('brands') }}">Brands</a></li>
                     <li class="breadcrumb-item active fw-700">{{ $brand->name }}</li>
+                @elseif(isset($pageTitle))
+                    <li class="breadcrumb-item active fw-700">{{ $pageTitle }}</li>
                 @else
                     <li class="breadcrumb-item active fw-700">{{ isset($query) ? 'Search Results' : 'All Products' }}</li>
                 @endif
@@ -43,6 +46,7 @@
                 @elseif(isset($subcategory)) {{ $subcategory->name }}
                 @elseif(isset($childCategory)) {{ $childCategory->name }}
                 @elseif(isset($brand))     {{ $brand->name }}
+                @elseif(isset($pageTitle)) {{ $pageTitle }}
                 @elseif(isset($query))     Search Results
                 @else All Products
                 @endif
@@ -208,7 +212,6 @@
     flex: 1;
     border: none;
     padding: 10px 10px 10px 36px;
-    font-family: 'Poppins', sans-serif;
     font-size: 0.83rem;
     color: var(--text-main);
     outline: none;
@@ -240,7 +243,6 @@
     padding: 11px 0;
     background: none;
     border: none;
-    font-family: 'Poppins', sans-serif;
     font-size: 0.85rem;
     font-weight: 600;
     color: var(--text-main);

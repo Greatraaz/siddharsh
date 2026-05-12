@@ -12,14 +12,21 @@ class Enquiry extends Model
 
     protected $fillable = [
         'product_id',
+        'brand_id',
         'name',
         'email',
         'phone',
+        'subject',
         'message'
     ];
 
     public function product()
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function brand()
+    {
+        return $this->belongsTo(Brand::class);
     }
 }

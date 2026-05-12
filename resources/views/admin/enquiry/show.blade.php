@@ -64,6 +64,12 @@
                         <label class="small text-muted text-uppercase fw-bold">Date Received</label>
                         <div class="fw-bold">{{ $enquiry->created_at->format('d M, Y h:i A') }}</div>
                     </div>
+                    @if($enquiry->subject)
+                    <div class="mb-3">
+                        <label class="small text-muted text-uppercase fw-bold">Subject</label>
+                        <div class="fw-bold">{{ $enquiry->subject }}</div>
+                    </div>
+                    @endif
                 </div>
             </div>
 
@@ -78,6 +84,21 @@
                     @endif
                     <h6 class="fw-bold mb-2">{{ $enquiry->product->name }}</h6>
                     <a href="{{ route('product.details', $enquiry->product->slug) }}" target="_blank" class="btn btn-sm btn-outline-primary w-100">
+                        View on Website
+                    </a>
+                </div>
+            </div>
+            @elseif($enquiry->brand)
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white border-bottom-0 pt-4 px-4">
+                    <h5 class="fw-bold mb-0">Inquired Brand</h5>
+                </div>
+                <div class="card-body p-4 text-center">
+                    @if($enquiry->brand->image)
+                    <img src="{{ asset('uploads/brands/' . $enquiry->brand->image) }}" alt="Brand" class="img-fluid rounded mb-3" style="max-height: 100px;">
+                    @endif
+                    <h6 class="fw-bold mb-2">{{ $enquiry->brand->name }}</h6>
+                    <a href="{{ route('brand.details', $enquiry->brand->slug) }}" target="_blank" class="btn btn-sm btn-outline-primary w-100">
                         View on Website
                     </a>
                 </div>

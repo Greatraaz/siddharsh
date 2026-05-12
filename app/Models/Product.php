@@ -30,6 +30,7 @@ class Product extends Model
         'additional_info',
 
         'featured',
+        'is_future',
         'status',
 
         'meta_title',
