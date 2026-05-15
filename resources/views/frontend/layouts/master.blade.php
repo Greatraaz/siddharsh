@@ -130,8 +130,8 @@
 
         .lh-tight { line-height: 1.1; }
 
-        .section-py  { padding-top: 90px; padding-bottom: 90px; }
-        .section-py-sm { padding-top: 60px; padding-bottom: 60px; }
+        .section-py  { padding-top: 60px; padding-bottom: 60px; }
+        .section-py-sm { padding-top: 40px; padding-bottom: 40px; }
 
         .border-radius    { border-radius: var(--radius) !important; }
         .border-radius-sm { border-radius: var(--radius-sm) !important; }
@@ -289,14 +289,14 @@
             background-size: cover !important;
             background-position: center !important;
             background-attachment: fixed;
-            padding: 100px 0;
+            padding: 60px 0;
             position: relative;
             overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
-            min-height: 350px;
+            min-height: 250px;
         }
         .page-banner::before {
             content: '';

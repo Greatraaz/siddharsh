@@ -37,7 +37,7 @@
 
                 {{-- Column 2: Newsletter & Contact --}}
                 <div class="col-lg-3 col-md-6">
-                    <h6 class="footer-col-title">Newsletter</h6>
+                    <h6 class="footer-col-title text-light">Newsletter</h6>
                     <p class="footer-sub-desc">Subscribe our newsletter to get our latest update & news.</p>
                     <form class="footer-nl-box mb-4">
                         <input type="email" placeholder="Your mail address" class="nl-input">
@@ -62,7 +62,7 @@
 
                 {{-- Column 3: Official Info --}}
                 <div class="col-lg-3 col-md-6">
-                    <h6 class="footer-col-title">Official info</h6>
+                    <h6 class="footer-col-title text-light">Official info</h6>
                     <div class="address-block mb-4">
                         <div class="a-icon"><i class="fas fa-map-marker-alt"></i></div>
                         <div class="a-info">
@@ -81,13 +81,13 @@
 
                 {{-- Column 4: Menu --}}
                 <div class="col-lg-3 col-md-6">
-                    <h6 class="footer-col-title">Menu</h6>
+                    <h6 class="footer-col-title text-light">Menu</h6> 
                     <ul class="footer-menu-list mb-4">
                         <li><a href="{{ route('home') }}"><i class="fas fa-link"></i> Home</a></li>
-                        <li><a href="#"><i class="fas fa-link"></i> About us</a></li>
-                        <li><a href="#"><i class="fas fa-link"></i> Services</a></li>
-                        <li><a href="#"><i class="fas fa-link"></i> Blog</a></li>
-                        <li><a href="#contact-section"><i class="fas fa-link"></i> Contact us</a></li>
+                        <li><a href="https://siddharsh.com/about-us/"><i class="fas fa-link"></i> About us</a></li>
+                        <li><a href="https://siddharsh.com/services/"><i class="fas fa-link"></i> Services</a></li>
+                        <li><a href="https://siddharsh.com/blog/"><i class="fas fa-link"></i> Blog</a></li>
+                        <li><a href="{{ route('contact') }}"><i class="fas fa-link"></i> Contact us</a></li>
                     </ul>
                     
                     <div class="footer-badge">

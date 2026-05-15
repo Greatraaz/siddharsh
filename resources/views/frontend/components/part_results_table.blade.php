@@ -4,7 +4,7 @@
             <tr>
                 <th class="ps-4">QTY</th>
                 <th>Manufacturer</th>
-                <th>Part Number</th>
+                <th>Part Code / SKU</th>
                 <th>Spec Sheet</th>
                 <th>Part Drawing</th>
                 <th>Obsolete</th>
@@ -28,6 +28,9 @@
                     </td>
                     <td>
                         <span class="badge bg-primary-soft text-primary px-2 py-1 fs-xs fw-700 rounded-pill">{{ $product->part_code }}</span>
+                        @if($product->part_number)
+                        <div class="text-muted fs-xs mt-1">SKU: {{ $product->part_number }}</div>
+                        @endif
                     </td>
                     <td>
                         <a href="#" class="text-muted fs-xs"><i class="fas fa-file-pdf me-1"></i> Download</a>

@@ -54,11 +54,11 @@
 {{-- ─── 3. INQUIRY & INFO ──────────────────────────────────── --}}
 <section class="section-py bg-light-brand overflow-hidden">
     <div class="container">
-        <div class="row g-5">
-            <div class="col-lg-5 reveal">
+        <div class="row g-5 mt-2">
+            <div class="col-lg-5 reveal pt-4">
                 <div class="inquiry-card shadow-xl rounded-4 overflow-hidden border-0">
                     <div class="inquiry-header p-4 text-white" style="background: var(--primary);">
-                        <h4 class="mb-0 fw-800">Send Enquiry</h4>
+                        <h4 class="mb-0 fw-800 text-light mb-1">Send Enquiry</h4>
                         <p class="small mb-0 opacity-75">Get a customized quote for {{ $brand->name }} solutions.</p>
                     </div>
                     <div class="p-4 bg-white">
@@ -81,7 +81,7 @@
                                 <label class="form-label small fw-700">Message</label>
                                 <textarea name="message" class="form-control rounded-3" rows="3" placeholder="Describe your requirement..."></textarea>
                             </div>
-                            <button type="submit" class="btn btn-primary w-100 py-3 fw-800 rounded-3">Submit Inquiry <i class="fas fa-paper-plane ms-2"></i></button>
+                            <button type="submit" class="btn btn-primary w-100 py-3 fw-800 rounded-3 text-center"> <i class="fas fa-paper-plane"></i>Submit Inquiry </button>
                         </form>
                     </div>
                 </div>
@@ -139,7 +139,7 @@
 {{-- ─── 6. CTA BANNER ──────────────────────────────────────── --}}
 <section class="section-py-sm bg-primary text-white text-center">
     <div class="container reveal">
-        <h3 class="fw-800 mb-3">Powering Connections, Enabling Growth</h3>
+        <h3 class="fw-800 mb-3 text-light">Powering Connections, Enabling Growth</h3>
         <p class="opacity-75 mb-4">Discover how {{ $brand->name }} solutions can transform your business infrastructure.</p>
         <a href="#contact-section" class="btn btn-light btn-lg px-5 py-3 fw-800 text-primary">Get Started Now</a>
     </div>

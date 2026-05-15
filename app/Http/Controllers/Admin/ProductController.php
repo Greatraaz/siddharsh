@@ -10,6 +10,7 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Subcategory;
 use App\Models\ChildCategory;
+use App\Models\Solution;
 use App\Models\ProductImage;
 use App\Models\ProductImportLog;
 use Illuminate\Http\Request;
@@ -41,6 +42,7 @@ class ProductController extends Controller
     {
         $brands = Brand::where('status', 1)->get();
         $categories = Category::where('status', 1)->get();
+        $solutions = Solution::where('status', 1)->get();
         
         $subcategories = collect();
         if (old('category_id')) {
@@ -52,7 +54,7 @@ class ProductController extends Controller
             $childcategories = ChildCategory::where('subcategory_id', old('subcategory_id'))->where('status', 1)->get();
         }
 
-        return view('admin.products.create', compact('brands', 'categories', 'subcategories', 'childcategories'));
+        return view('admin.products.create', compact('brands', 'categories', 'solutions', 'subcategories', 'childcategories'));
     }
 
     /**
@@ -71,17 +73,20 @@ class ProductController extends Controller
 
             'name'           => 'required|string|max:255|unique:products,name',
             'part_code'      => 'required|string|max:255|unique:products,part_code',
+            'part_number'    => 'nullable|string|unique:products,part_number',
 
             'image'          => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'images.*'       => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
 
             'short_description' => 'nullable|string',
-            'full_description'  => 'nullable|string',
+            'variant'        => 'nullable|string',
             'specifications'    => 'nullable|string',
 
             'tags'           => 'nullable|string',
             'packaging'      => 'nullable|string',
             'additional_info'=> 'nullable|string',
+            'solution_ids'   => 'nullable|array',
+            'solution_ids.*' => 'nullable|exists:solutions,id',
 
             'status'         => 'required|in:0,1',
             'featured'       => 'nullable|in:0,1',
@@ -112,11 +117,12 @@ class ProductController extends Controller
             'name'               => $request->name,
             'slug'               => Str::slug($request->name),
             'part_code'          => $request->part_code,
+            'part_number'        => $request->part_number,
 
             'thumbnail'          => $imageName,
 
             'short_description'  => $request->short_description,
-            'full_description'   => $request->full_description,
+            'variant'            => $request->variant,
             'specifications'     => $request->specifications,
 
             'tags'               => $request->tags,
@@ -145,6 +151,8 @@ class ProductController extends Controller
             }
         }
 
+        $product->solutions()->sync($request->input('solution_ids', []));
+
         return redirect()
             ->route('admin.products.index')
             ->with('success', 'Product Created Successfully');
@@ -167,6 +175,7 @@ class ProductController extends Controller
         $product = Product::findOrFail($id);
         $brands = Brand::where('status', 1)->get();
         $categories = Category::where('status', 1)->get();
+        $solutions = Solution::where('status', 1)->get();
         
         $categoryId = old('category_id', $product->category_id);
         $subcategoryId = old('subcategory_id', $product->subcategory_id);
@@ -174,7 +183,7 @@ class ProductController extends Controller
         $subcategories = Subcategory::where('category_id', $categoryId)->where('status', 1)->get();
         $childcategories = ChildCategory::where('subcategory_id', $subcategoryId)->where('status', 1)->get();
 
-        return view('admin.products.edit', compact('product', 'brands', 'categories', 'subcategories', 'childcategories'));
+        return view('admin.products.edit', compact('product', 'brands', 'categories', 'solutions', 'subcategories', 'childcategories'));
         }
 
     /**
@@ -193,17 +202,20 @@ class ProductController extends Controller
 
             'name'           => 'required|unique:products,name,'.$product->id,
             'part_code'      => 'required|unique:products,part_code,'.$product->id,
+            'part_number'    => 'nullable|string|unique:products,part_number,'.$product->id,
 
             'image'          => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'images.*'       => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
 
             'short_description' => 'nullable|string',
-            'full_description'  => 'nullable|string',
+            'variant'        => 'nullable|string',
             'specifications'    => 'nullable|string',
 
             'tags'           => 'nullable|string',
             'packaging'      => 'nullable|string',
             'additional_info'=> 'nullable|string',
+            'solution_ids'   => 'nullable|array',
+            'solution_ids.*' => 'nullable|exists:solutions,id',
 
             'status'         => 'required|in:0,1',
             'featured'       => 'nullable|in:0,1',
@@ -272,6 +284,8 @@ class ProductController extends Controller
                 ]);
             }
         }
+
+        $product->solutions()->sync($request->input('solution_ids', []));
 
         return redirect()
             ->route('admin.products.index')
@@ -379,7 +393,7 @@ class ProductController extends Controller
     public function importStatus(string $id)
     {
         $log = ProductImportLog::findOrFail($id);
-        $processed = $log->imported_rows + $log->skipped_rows;
+        $processed = $log->imported_rows + $log->skipped_rows + ($log->failed_rows ?? 0);
         $percent = $log->total_rows > 0
             ? (int) min(100, round(($processed / $log->total_rows) * 100))
             : null;
@@ -390,7 +404,10 @@ class ProductController extends Controller
             'total_rows' => $log->total_rows,
             'imported_rows' => $log->imported_rows,
             'skipped_rows' => $log->skipped_rows,
+            'failed_rows' => $log->failed_rows ?? 0,
+            'warning_rows' => $log->warning_rows ?? 0,
             'errors' => $log->errors ?? [],
+            'detailed_logs' => $log->detailed_logs ?? [],
             'percent' => $percent,
             'started_at' => $log->started_at,
             'completed_at' => $log->completed_at,
@@ -418,6 +435,7 @@ class ProductController extends Controller
             'specifications',
             'packaging',
             'additional_info',
+            'solutions',
             'featured',
             'is_future',
             'meta_title',
@@ -442,6 +460,7 @@ class ProductController extends Controller
             'Size: 10mm; Material: Steel',
             'Retail box',
             'Optional notes',
+            'Solution A, Solution B',
             1,
             0,
             'Sample SEO title',
@@ -453,7 +472,7 @@ class ProductController extends Controller
         $sheet->fromArray([$headers], null, 'A1');
         $sheet->fromArray([$sample], null, 'A2');
 
-        $lastCol = 'U';
+        $lastCol = 'V';
         $sheet->getStyle('A1:'.$lastCol.'1')->applyFromArray([
             'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
             'fill' => [

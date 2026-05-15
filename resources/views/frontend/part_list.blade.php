@@ -31,7 +31,7 @@
                     {{-- Search Box --}}
                     <div class="col-xl-4 col-lg-5">
                         <div class="part-search-wrap">
-                            <input type="text" id="part-search-input" value="{{ $query ?? '' }}" class="form-control part-search-input" placeholder="Enter Part Number (e.g. MP300)..." autocomplete="off">
+                            <input type="text" id="part-search-input" value="{{ $query ?? '' }}" class="form-control part-search-input" placeholder="Search by SKU, part code, part number, brand, or model..." autocomplete="off">
                             <button type="button" id="part-search-btn" class="part-search-btn"><i class="fas fa-search"></i></button>
                         </div>
                     </div>

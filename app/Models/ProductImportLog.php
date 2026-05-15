@@ -11,8 +11,11 @@ class ProductImportLog extends Model
         'total_rows',
         'imported_rows',
         'skipped_rows',
+        'failed_rows',
+        'warning_rows',
         'status',
         'errors',
+        'detailed_logs',
         'started_at',
         'completed_at',
     ];
@@ -21,6 +24,7 @@ class ProductImportLog extends Model
     {
         return [
             'errors' => 'array',
+            'detailed_logs' => 'array',
             'started_at' => 'datetime',
             'completed_at' => 'datetime',
         ];

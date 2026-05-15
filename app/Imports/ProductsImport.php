@@ -8,6 +8,7 @@ use App\Models\ChildCategory;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\ProductImportLog;
+use App\Models\Solution;
 use App\Models\Subcategory;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -33,6 +34,9 @@ class ProductsImport implements OnEachRow, WithChunkReading, SkipsEmptyRows, Wit
     /** @var array<string, ChildCategory|null> */
     private array $childCategoryCache = [];
 
+    /** @var array<string, int|null> */
+    private array $solutionCache = [];
+
     /** @var array<string, string>|null */
     private ?array $imageIndex = null;
 
@@ -57,31 +61,79 @@ class ProductsImport implements OnEachRow, WithChunkReading, SkipsEmptyRows, Wit
         $data = $row->toArray();
 
         $name = $this->stringValue($this->getCell($data, 'name'));
-        if ($name === '') {
-            $this->skipRow($rowIndex, 'Product name is required.');
+        $partCode = $this->stringValue($this->getCell($data, 'part_code'));
 
+        if ($name === '') {
+            $this->logSkippedRow($rowIndex, $partCode, $name, 'Product name is required.');
             return;
+        }
+
+        // Check for duplicate part_code if provided
+        if ($partCode !== '') {
+            $existingProduct = Product::withTrashed()->where('part_code', $partCode)->first();
+            if ($existingProduct && $existingProduct->name !== $name) {
+                $this->logSkippedRow($rowIndex, $partCode, $name, 'Duplicate part_code: ' . $partCode . ' already exists for another product.');
+                return;
+            }
         }
 
         $categoryName = $this->stringValue($this->getCell($data, 'category'));
         $subName = $this->stringValue($this->getCell($data, 'sub_category', 'subcategory'));
-        if ($categoryName === '' || $subName === '') {
-            $this->skipRow($rowIndex, 'Category and sub_category are required.');
+        $childCell = $this->stringValue($this->getCell($data, 'child_category', 'childcategory'));
 
+        if ($categoryName === '') {
+            $this->logSkippedRow($rowIndex, $partCode, $name, 'Category is required.');
+            return;
+        }
+
+        if ($subName === '' && $childCell === '') {
+            $this->logSkippedRow($rowIndex, $partCode, $name, 'Either sub_category or child_category is required.');
             return;
         }
 
         $category = $this->resolveCategory($categoryName);
         if (! $category) {
-            $this->skipRow($rowIndex, 'Category not found: '.$categoryName);
-
+            $this->logSkippedRow($rowIndex, $partCode, $name, 'Category not found: '.$categoryName);
             return;
         }
 
-        $subcategory = $this->resolveSubcategory($category->id, $subName);
-        if (! $subcategory) {
-            $this->skipRow($rowIndex, 'Subcategory not found for this category: '.$subName);
+        $subcategory = null;
+        $childCategoryId = null;
 
+        if ($subName !== '') {
+            // Case 1 & 2: Standard hierarchy structure
+            $subcategory = $this->resolveSubcategory($category->id, $subName);
+            
+            if ($subcategory) {
+                if ($childCell !== '') {
+                    $child = $this->resolveChildCategory($category->id, $subcategory->id, $childCell);
+                    if ($child) {
+                        $childCategoryId = $child->id;
+                    }
+                }
+            }
+        } else {
+            // Case 3: Mixed hierarchy support
+            $levelName = $childCell;
+            
+            if ($levelName !== '') {
+                // First search inside Subcategories for this category
+                $subcategory = $this->resolveSubcategory($category->id, $levelName);
+                
+                if (!$subcategory) {
+                    // Else search inside Child Categories globally
+                    $child = ChildCategory::whereRaw('LOWER(name) = ?', [Str::lower($levelName)])->first();
+                    if ($child) {
+                        $childCategoryId = $child->id;
+                        $subcategory = $child->subcategory;
+                    }
+                }
+            }
+        }
+
+        // Skip only if sub category not found (either directly or via child)
+        if ($subcategory === null) {
+            $this->logSkippedRow($rowIndex, $partCode, $name, 'Subcategory / Child category not found for hierarchy mapping.');
             return;
         }
 
@@ -90,22 +142,9 @@ class ProductsImport implements OnEachRow, WithChunkReading, SkipsEmptyRows, Wit
         if ($brandCell !== '') {
             $brandId = $this->resolveBrandId($brandCell);
             if ($brandId === null) {
-                $this->skipRow($rowIndex, 'Brand not found: '.$brandCell);
-
+                $this->logSkippedRow($rowIndex, $partCode, $name, 'Brand not found: '.$brandCell);
                 return;
             }
-        }
-
-        $childCategoryId = null;
-        $childCell = $this->stringValue($this->getCell($data, 'child_category', 'childcategory'));
-        if ($childCell !== '') {
-            $child = $this->resolveChildCategory($category->id, $subcategory->id, $childCell);
-            if (! $child) {
-                $this->skipRow($rowIndex, 'Child category not found for this category/subcategory: '.$childCell);
-
-                return;
-            }
-            $childCategoryId = $child->id;
         }
 
         $slugInput = $this->stringValue($this->getCell($data, 'slug'));
@@ -127,6 +166,7 @@ class ProductsImport implements OnEachRow, WithChunkReading, SkipsEmptyRows, Wit
 
         $thumbCell = $this->stringValue($this->getCell($data, 'thumbnail'));
         $thumbnail = null;
+        $thumbnailWarning = null;
         if ($thumbCell !== '') {
             $thumbnail = $this->copyImageFromZip(
                 $thumbCell,
@@ -134,7 +174,7 @@ class ProductsImport implements OnEachRow, WithChunkReading, SkipsEmptyRows, Wit
                 $slug . '_' . $dateStr . '_thumbnail'
             );
             if (!$thumbnail) {
-                $this->applyLogDelta(0, 0, [['row' => $rowIndex, 'message' => "Warning: Thumbnail image '{$thumbCell}' not found in ZIP archive."]]);
+                $thumbnailWarning = "Thumbnail image '{$thumbCell}' not found in ZIP archive.";
             }
         } elseif ($productExists && $productExists->thumbnail) {
             $thumbnail = $productExists->thumbnail;
@@ -144,55 +184,75 @@ class ProductsImport implements OnEachRow, WithChunkReading, SkipsEmptyRows, Wit
         $featured = $this->parseBoolStatus($this->getCell($data, 'featured'), false);
         $isFuture = $this->parseBoolStatus($this->getCell($data, 'is_future', 'future'), false);
 
-        DB::transaction(function () use ($data, $brandId, $category, $subcategory, $childCategoryId, $name, $slug, $partCodeCell, $thumbnail, $status, $featured, $dateStr, $isFuture, $productExists) {
-            $partCode = $partCodeCell !== '' ? $partCodeCell : ($productExists?->part_code ?? $this->uniquePartCode());
-            
-            $product = Product::updateOrCreate(
-                ['name' => $name],
-                [
-                    'brand_id' => $brandId,
-                    'category_id' => $category->id,
-                    'subcategory_id' => $subcategory->id,
-                    'child_category_id' => $childCategoryId,
-                    'slug' => $productExists?->slug ?? $slug,
-                    'part_code' => $partCode,
-                    'thumbnail' => $thumbnail,
-                    'short_description' => $this->nullableString($this->getCell($data, 'short_description')),
-                    'full_description' => $this->nullableString($this->getCell($data, 'full_description')),
-                    'specifications' => $this->nullableString($this->getCell($data, 'specifications')),
-                    'tags' => $this->nullableString($this->getCell($data, 'tags')),
-                    'packaging' => $this->nullableString($this->getCell($data, 'packaging')),
-                    'additional_info' => $this->nullableString($this->getCell($data, 'additional_info')),
-                    'featured' => $featured,
-                    'is_future' => $isFuture,
-                    'status' => $status,
-                    'meta_title' => $this->nullableString($this->getCell($data, 'meta_title')),
-                    'meta_description' => $this->nullableString($this->getCell($data, 'meta_description')),
-                    'meta_keywords' => $this->nullableString($this->getCell($data, 'meta_keywords')),
-                ]
-            );
+        try {
+            DB::transaction(function () use ($data, $brandId, $category, $subcategory, $childCategoryId, $name, $slug, $partCode, $thumbnail, $status, $featured, $dateStr, $isFuture, $productExists) {
+                $finalPartCode = $partCode !== '' ? $partCode : ($productExists?->part_code ?? $this->uniquePartCode());
+                
+                $product = Product::updateOrCreate(
+                    ['name' => $name],
+                    [
+                        'brand_id' => $brandId,
+                        'category_id' => $category->id,
+                        'subcategory_id' => $subcategory->id,
+                        'child_category_id' => $childCategoryId,
+                        'slug' => $productExists?->slug ?? $slug,
+                        'part_code' => $finalPartCode,
+                        'part_number' => $this->nullableString($this->getCell($data, 'part_number')),
+                        'thumbnail' => $thumbnail,
+                        'short_description' => $this->nullableString($this->getCell($data, 'short_description')),
+                        'variant' => $this->nullableString($this->getCell($data, 'variant')),
+                        'specifications' => $this->nullableString($this->getCell($data, 'specifications')),
+                        'tags' => $this->nullableString($this->getCell($data, 'tags')),
+                        'packaging' => $this->nullableString($this->getCell($data, 'packaging')),
+                        'additional_info' => $this->nullableString($this->getCell($data, 'additional_info')),
+                        'featured' => $featured,
+                        'is_future' => $isFuture,
+                        'status' => $status,
+                        'meta_title' => $this->nullableString($this->getCell($data, 'meta_title')),
+                        'meta_description' => $this->nullableString($this->getCell($data, 'meta_description')),
+                        'meta_keywords' => $this->nullableString($this->getCell($data, 'meta_keywords')),
+                    ]
+                );
 
-            $galleryRaw = $this->stringValue($this->getCell($data, 'gallery_images', 'gallery'));
-            if ($galleryRaw !== '') {
-                $names = preg_split('/\s*[,;|]\s*/', $galleryRaw, -1, PREG_SPLIT_NO_EMPTY) ?: [];
-                $galleryDir = public_path('uploads/products/gallery');
-                foreach ($names as $index => $imageName) {
-                    $stored = $this->copyImageFromZip(
-                        $imageName, 
-                        $galleryDir,
-                        $slug . '_' . $dateStr . '_gallery_' . ($index + 1)
-                    );
-                    if ($stored) {
-                        ProductImage::create([
-                            'product_id' => $product->id,
-                            'image' => $stored,
-                        ]);
+                $galleryRaw = $this->stringValue($this->getCell($data, 'gallery_images', 'gallery'));
+                if ($galleryRaw !== '') {
+                    $names = preg_split('/\s*[,;|]\s*/', $galleryRaw, -1, PREG_SPLIT_NO_EMPTY) ?: [];
+                    $galleryDir = public_path('uploads/products/gallery');
+                    foreach ($names as $index => $imageName) {
+                        $stored = $this->copyImageFromZip(
+                            $imageName, 
+                            $galleryDir,
+                            $slug . '_' . $dateStr . '_gallery_' . ($index + 1)
+                        );
+                        if ($stored) {
+                            ProductImage::create([
+                                'product_id' => $product->id,
+                                'image' => $stored,
+                            ]);
+                        } else {
+                            // Log warning for missing gallery image
+                            $this->logWarningRow($rowIndex, $finalPartCode, $name, "Gallery image '{$imageName}' not found in ZIP archive.");
+                        }
                     }
                 }
-            }
-        });
 
-        $this->applyLogDelta(1, 0, []);
+                // Handle solutions
+                $solutionsRaw = $this->stringValue($this->getCell($data, 'solutions'));
+                if ($solutionsRaw !== '') {
+                    $solutionIds = $this->resolveSolutionIds($solutionsRaw);
+                    $product->solutions()->sync($solutionIds);
+                }
+            });
+
+            // Log warning if thumbnail was missing
+            if ($thumbnailWarning) {
+                $this->logWarningRow($rowIndex, $partCode, $name, $thumbnailWarning);
+            }
+
+            $this->applyLogDelta(1, 0, 0, $thumbnailWarning ? 1 : 0, []);
+        } catch (\Throwable $e) {
+            $this->logFailedRow($rowIndex, $partCode, $name, 'Database error: ' . $e->getMessage());
+        }
     }
 
     private function skipRow(?int $rowIndex, string $message): void
@@ -206,12 +266,52 @@ class ProductsImport implements OnEachRow, WithChunkReading, SkipsEmptyRows, Wit
         $this->applyLogDelta(0, 1, $errors);
     }
 
+    private function logSkippedRow(int $rowIndex, string $partCode, string $productName, string $message): void
+    {
+        $this->logDetailedRow($rowIndex, $partCode, $productName, 'skipped', $message);
+        $this->applyLogDelta(0, 1, 0, 0, []);
+    }
+
+    private function logFailedRow(int $rowIndex, string $partCode, string $productName, string $message): void
+    {
+        $this->logDetailedRow($rowIndex, $partCode, $productName, 'failed', $message);
+        $this->applyLogDelta(0, 0, 1, 0, []);
+    }
+
+    private function logWarningRow(int $rowIndex, string $partCode, string $productName, string $message): void
+    {
+        $this->logDetailedRow($rowIndex, $partCode, $productName, 'warning', $message);
+        $this->applyLogDelta(0, 0, 0, 1, []);
+    }
+
+    private function logDetailedRow(int $rowIndex, string $partCode, string $productName, string $status, string $message): void
+    {
+        $log = ProductImportLog::find($this->importLogId);
+        if (!$log) {
+            return;
+        }
+
+        $detailedLog = [
+            'row' => $rowIndex,
+            'part_code' => $partCode,
+            'product_name' => $productName,
+            'status' => $status,
+            'message' => $message,
+            'timestamp' => now()->toISOString(),
+        ];
+
+        $existingLogs = $log->detailed_logs ?? [];
+        $existingLogs[] = $detailedLog;
+
+        $log->update(['detailed_logs' => $existingLogs]);
+    }
+
     /**
      * @param  list<array{row: int|null, message: string}>  $newErrors
      */
-    private function applyLogDelta(int $imported, int $skipped, array $newErrors): void
+    private function applyLogDelta(int $imported, int $skipped, int $failed = 0, int $warning = 0, array $newErrors = []): void
     {
-        if ($imported === 0 && $skipped === 0 && $newErrors === []) {
+        if ($imported === 0 && $skipped === 0 && $failed === 0 && $warning === 0 && $newErrors === []) {
             return;
         }
 
@@ -228,6 +328,8 @@ class ProductsImport implements OnEachRow, WithChunkReading, SkipsEmptyRows, Wit
         $log->update([
             'imported_rows' => $log->imported_rows + $imported,
             'skipped_rows' => $log->skipped_rows + $skipped,
+            'failed_rows' => ($log->failed_rows ?? 0) + $failed,
+            'warning_rows' => ($log->warning_rows ?? 0) + $warning,
             'errors' => $merged,
         ]);
     }
@@ -271,16 +373,20 @@ class ProductsImport implements OnEachRow, WithChunkReading, SkipsEmptyRows, Wit
         return $sub;
     }
 
-    private function resolveChildCategory(int $categoryId, int $subcategoryId, string $name): ?ChildCategory
+    private function resolveChildCategory(int $categoryId, ?int $subcategoryId, string $name): ?ChildCategory
     {
-        $key = $categoryId.'|'.$subcategoryId.'|'.Str::lower($name);
+        $key = $categoryId.'|'.($subcategoryId === null ? 'null' : $subcategoryId).'|'.Str::lower($name);
         if (array_key_exists($key, $this->childCategoryCache)) {
             return $this->childCategoryCache[$key];
         }
-        $child = ChildCategory::where('category_id', $categoryId)
-            ->where('subcategory_id', $subcategoryId)
-            ->whereRaw('LOWER(name) = ?', [Str::lower($name)])
-            ->first();
+        $query = ChildCategory::where('category_id', $categoryId)
+            ->whereRaw('LOWER(name) = ?', [Str::lower($name)]);
+
+        if ($subcategoryId !== null) {
+            $query->where('subcategory_id', $subcategoryId);
+        }
+
+        $child = $query->first();
         $this->childCategoryCache[$key] = $child;
 
         return $child;
@@ -309,27 +415,29 @@ class ProductsImport implements OnEachRow, WithChunkReading, SkipsEmptyRows, Wit
 
     private function copyImageFromZip(string $filename, string $destDir, ?string $customName = null): ?string
     {
-        $filename = trim($filename);
+        $filename = trim(str_replace('\\', '/', $filename));
         if ($filename === '') {
             return null;
         }
 
-        $basename = basename($filename);
         $idx = $this->imageIndex();
-        $lower = Str::lower($basename);
-        if (! isset($idx[$lower])) {
+        $key = Str::lower($filename);
+        $source = $idx[$key] ?? null;
+
+        if ($source === null) {
+            $basename = basename($filename);
+            $key = Str::lower($basename);
+            $source = $idx[$key] ?? null;
+        }
+
+        if (! $source || ! is_file($source)) {
             return null;
         }
 
-        $source = $idx[$lower];
-        if (! is_file($source)) {
-            return null;
-        }
-
-        $extension = pathinfo($basename, PATHINFO_EXTENSION);
-        $newName = $customName 
-            ? $customName . '.' . $extension 
-            : time().'_'.uniqid('', true).'_'.$basename;
+        $extension = pathinfo($source, PATHINFO_EXTENSION) ?: pathinfo($filename, PATHINFO_EXTENSION);
+        $newName = $customName
+            ? $customName . '.' . $extension
+            : time().'_'.uniqid('', true).'_'.basename($source);
 
         if (! is_dir($destDir)) {
             mkdir($destDir, 0755, true);
@@ -355,15 +463,25 @@ class ProductsImport implements OnEachRow, WithChunkReading, SkipsEmptyRows, Wit
             return $this->imageIndex;
         }
 
+        $basePath = rtrim($this->imagesExtractPath, DIRECTORY_SEPARATOR);
         $iterator = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($this->imagesExtractPath, \FilesystemIterator::SKIP_DOTS)
+            new \RecursiveDirectoryIterator($basePath, \FilesystemIterator::SKIP_DOTS)
         );
 
         foreach ($iterator as $file) {
             if (! $file->isFile()) {
                 continue;
             }
-            $this->imageIndex[Str::lower($file->getBasename())] = $file->getPathname();
+
+            $pathName = $file->getPathname();
+            $relative = ltrim(str_replace('\\', '/', substr($pathName, strlen($basePath))), '/');
+            $lowerRelative = Str::lower($relative);
+            $lowerBasename = Str::lower($file->getBasename());
+
+            $this->imageIndex[$lowerRelative] = $pathName;
+            if (! isset($this->imageIndex[$lowerBasename])) {
+                $this->imageIndex[$lowerBasename] = $pathName;
+            }
         }
 
         return $this->imageIndex;
@@ -414,5 +532,37 @@ class ProductsImport implements OnEachRow, WithChunkReading, SkipsEmptyRows, Wit
         }
 
         return null;
+    }
+
+    /**
+     * @return array<int>
+     */
+    private function resolveSolutionIds(string $solutionNames): array
+    {
+        if (trim($solutionNames) === '') {
+            return [];
+        }
+
+        $names = preg_split('/\s*[,;|]\s*/', $solutionNames, -1, PREG_SPLIT_NO_EMPTY) ?: [];
+        $ids = [];
+
+        foreach ($names as $name) {
+            $key = Str::lower(trim($name));
+            if (array_key_exists($key, $this->solutionCache)) {
+                $id = $this->solutionCache[$key];
+                if ($id !== null) {
+                    $ids[] = $id;
+                }
+            } else {
+                $solution = Solution::whereRaw('LOWER(name) = ?', [$key])->first();
+                $id = $solution?->id;
+                $this->solutionCache[$key] = $id;
+                if ($id !== null) {
+                    $ids[] = $id;
+                }
+            }
+        }
+
+        return array_unique($ids);
     }
 }

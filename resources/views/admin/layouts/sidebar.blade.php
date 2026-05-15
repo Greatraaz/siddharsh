@@ -37,6 +37,10 @@
             <i class="fa-solid fa-box"></i>
             <span>Products</span>
         </a>
+        <a href="{{ route('admin.solutions.index') }}" class="nav-link {{ request()->routeIs('admin.solutions.*') ? 'active' : '' }}">
+            <i class="fa-solid fa-lightbulb"></i>
+            <span>Solutions</span>
+        </a>
         <a href="{{ route('admin.enquiries.index') }}" class="nav-link {{ request()->routeIs('admin.enquiries.*') ? 'active' : '' }}">
             <i class="fa-solid fa-envelope"></i>
             <span>Enquiries</span>

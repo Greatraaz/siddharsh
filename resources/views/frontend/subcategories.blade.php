@@ -25,35 +25,31 @@
             </h1>
         </div>
     </div>
-</section>
-
-{{-- Sub Categories Grid --}}
+</section>{{-- Sub Categories Grid --}}
 <section class="section-py bg-light-brand">
     <div class="container">
-        <div class="section-header reveal mb-5 text-center d-block">
+        <div class="section-header reveal mb-5 text-center">
             <span class="section-label mx-auto">Available Sub-Solutions</span>
             <h2 class="section-title">Select a Specialized Category</h2>
+            <p class="text-muted mt-3 max-w-600 mx-auto">Explore our diverse range of specialized IT infrastructure and networking sub-categories tailored for your specific business needs.</p>
         </div>
-        <div class="row g-4">
+        <div class="row g-4 justify-content-center">
             @forelse($subcategories as $i => $sub)
-            @php $subImg = $sub->image ? asset('uploads/subcategories/'.$sub->image) : 'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&w=600&q=80'; @endphp
+            @php 
+                $subImg = $sub->image ? asset('uploads/subcategories/'.$sub->image) : 'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&w=600&q=80'; 
+            @endphp
             <div class="col-xl-3 col-lg-4 col-md-6 d-flex align-items-stretch reveal reveal-delay-{{ min(($i % 4) + 1, 4) }}">
-                <div class="brand-premium-card w-100 shadow-md d-flex flex-column" style="background: #fff; border-radius: 16px; overflow: hidden; border: 1px solid var(--border-light);">
-                    <a href="{{ route('subcategory.products', $sub->slug) }}" class="brand-card-top" style="height: 200px; overflow: hidden; background: #fff; display: block;">
-                        <img src="{{ $subImg }}" alt="{{ $sub->name }}" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
-                    </a>
-                    <div class="brand-card-bottom-box p-3" style="background: var(--primary); text-align: left; border-radius: 0; margin: 0; flex-grow: 1; display: flex; flex-direction: column;">
-                        <div class="mb-3">
-                            <span class="badge bg-white text-primary fw-800" style="font-size: 0.65rem; text-transform: uppercase; white-space: normal; line-height: 1.4; display: inline-block; padding: 6px 10px; border-radius: 6px;">
-                                {{ $sub->category->name ?? 'Category' }}
-                            </span>
+                <div class="sub-premium-card w-100">
+                    <div class="sub-card-image">
+                        <img src="{{ $subImg }}" alt="{{ $sub->name }}" loading="lazy">
+                        <div class="sub-card-overlay">
+                            <span class="category-tag">{{ $sub->category->name ?? 'Category' }}</span>
                         </div>
-                        <h3 class="brand-card-heading text-white mb-2" style="font-size: 1.1rem; font-weight: 800; line-height: 1.3;">{{ $sub->name }}</h3>
-                        
-
-
-                        <div class="mt-4">
-                            <a href="{{ route('subcategory.products', $sub->slug) }}" class="btn btn-white w-100 fw-800 py-2 d-flex align-items-center justify-content-center" style="font-size: 0.85rem; border-radius: 10px; background: #ffffff; color: var(--primary) !important; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+                    </div>
+                    <div class="sub-card-body p-4">
+                        <h3 class="sub-card-title mb-3">{{ $sub->name }}</h3>
+                        <div class="mt-auto">
+                            <a href="{{ route('subcategory.products', $sub->slug) }}" class="btn btn-primary w-100 justify-content-center rounded-pill">
                                 View Products <i class="fas fa-arrow-right ms-2"></i>
                             </a>
                         </div>
@@ -85,28 +81,73 @@
 
 @push('styles')
 <style>
-/* Reusing styles from categories page or adding specific ones if needed */
-.bg-primary-soft { background-color: var(--primary-soft) !important; }
-.fw-600 { font-weight: 600; }
-.fw-700 { font-weight: 700; }
-.fw-800 { font-weight: 800; }
+.max-w-600 { max-width: 600px; }
 
-.brand-premium-card {
+.sub-premium-card {
+    background: #fff;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
     transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    display: flex;
+    flex-direction: column;
+    border: 1px solid rgba(0,0,0,0.04);
 }
-.brand-premium-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.1) !important;
+.sub-premium-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 30px 60px rgba(0,126,94,0.15);
+    border-color: rgba(0,126,94,0.2);
 }
-.btn-white {
-    background-color: #ffffff !important;
-    color: var(--primary) !important;
-    transition: all 0.3s ease;
+
+.sub-card-image {
+    height: 220px;
+    position: relative;
+    overflow: hidden;
 }
-.btn-white:hover {
-    background-color: #f8f9fa !important;
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2) !important;
+.sub-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+}
+.sub-premium-card:hover .sub-card-image img {
+    transform: scale(1.1);
+}
+
+.sub-card-overlay {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    z-index: 2;
+}
+.category-tag {
+    background: rgba(255, 255, 255, 0.95);
+    color: #007e5e;
+    padding: 6px 14px;
+    border-radius: 50px;
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.sub-card-body {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+.sub-card-title {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1.3;
+}
+
+/* Custom button hover for sub-card */
+.sub-premium-card .btn-primary {
+    padding: 12px 20px;
+    font-size: 0.85rem;
 }
 </style>
 @endpush

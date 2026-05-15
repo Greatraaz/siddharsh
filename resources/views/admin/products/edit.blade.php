@@ -1,5 +1,28 @@
 @extends('admin.layouts.app')
 
+@push('css')
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
+<style>
+    .select2-container--bootstrap-5 .select2-selection--multiple .select2-selection__choice {
+        background-color: #4f46e5;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        padding: 2px 8px;
+    }
+    .select2-container--bootstrap-5 .select2-selection--multiple .select2-selection__choice__remove {
+        color: #fff;
+        margin-right: 5px;
+    }
+    .select2-container--bootstrap-5 .select2-selection--multiple .select2-selection__choice__remove:hover {
+        background-color: rgba(255,255,255,0.2);
+        color: #fff;
+    }
+</style>
+@endpush
+
+
 @section('content')
 
 <div class="container-fluid">
@@ -74,6 +97,18 @@
 
                 </div>
 
+                    <div class="col-md-12 mb-3">
+                        <label class="form-label fw-bold">Solutions</label>
+                        <select name="solution_ids[]" multiple class="form-select select2 @error('solution_ids') is-invalid @enderror">
+                            @foreach($solutions as $solution)
+                                <option value="{{ $solution->id }}" {{ collect(old('solution_ids', $product->solutions->pluck('id')->toArray()))->contains($solution->id) ? 'selected' : '' }}>
+                                    {{ $solution->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('solution_ids') <small class="text-danger">{{ $message }}</small> @enderror
+                    </div>
+
                 <div class="mb-3">
                     <label>Product Name</label>
                     <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" value="{{ old('name', $product->name) }}" required>
@@ -83,6 +118,11 @@
                     <label>Part Code</label>
                     <input type="text" name="part_code" class="form-control @error('part_code') is-invalid @enderror" value="{{ old('part_code', $product->part_code) }}" required>
                     @error('part_code') <small class="text-danger">{{ $message }}</small> @enderror
+                </div>
+                <div class="mb-3">
+                    <label>Part Number</label>
+                    <input type="text" name="part_number" class="form-control @error('part_number') is-invalid @enderror" value="{{ old('part_number', $product->part_number) }}">
+                    @error('part_number') <small class="text-danger">{{ $message }}</small> @enderror
                 </div>
                 <div class="mb-3">
                     <label>Product Title Tags</label>
@@ -140,9 +180,9 @@
                 </div>
 
                 <div class="mb-3">
-                    <label>Full Description</label>
-                    <textarea name="full_description" class="form-control editor @error('full_description') is-invalid @enderror">{{ old('full_description', $product->full_description) }}</textarea>
-                    @error('full_description') <small class="text-danger">{{ $message }}</small> @enderror
+                    <label>Variant</label>
+                    <textarea name="variant" class="form-control editor @error('variant') is-invalid @enderror">{{ old('variant', $product->variant) }}</textarea>
+                    @error('variant') <small class="text-danger">{{ $message }}</small> @enderror
                 </div>
 
                 <div class="mb-3">
@@ -216,6 +256,7 @@
 </div>
 
 @push('js')
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
 
 <script>
@@ -228,6 +269,12 @@ document.querySelectorAll('.editor').forEach((el) => {
 });
 
 $(document).ready(function() {
+    $('.select2').select2({
+        theme: 'bootstrap-5',
+        placeholder: 'Select Solutions',
+        allowClear: true
+    });
+
     $('#category_id').on('change', function() {
         var categoryId = $(this).val();
         var subcategoryDropdown = $('#subcategory_id');

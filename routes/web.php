@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\Admin\SolutionController;
 use App\Http\Controllers\Admin\UserController;
 
 /*
@@ -20,7 +21,12 @@ use App\Http\Controllers\Admin\UserController;
 | Frontend Routes
 |--------------------------------------------------------------------------
 */
+Route::get('/migrate', function () {
 
+    Artisan::call('migrate');
+
+    return "Migration Run Successfully";
+});
 Route::get('/', [FrontendController::class, 'index'])->name('home');
 Route::get('/brands', [FrontendController::class, 'brands'])->name('brands');
 Route::get('/categories', [FrontendController::class, 'categories'])->name('categories');
@@ -39,6 +45,8 @@ Route::get('/contact-us', [FrontendController::class, 'contact'])->name('contact
 Route::post('/enquiry/submit', [FrontendController::class, 'enquirySubmit'])->name('enquiry.submit');
 Route::get('/thank-you', [FrontendController::class, 'thankYou'])->name('thank.you');
 Route::get('/future-products', [FrontendController::class, 'futureProducts'])->name('future.products');
+Route::get('/solutions', [FrontendController::class, 'solutions'])->name('solutions.index');
+Route::get('/solutions/{slug}', [FrontendController::class, 'solutionDetails'])->name('solutions.show');
 
 // AJAX routes for mega menu
 Route::get('/apisubcategories/{category_id}', [FrontendController::class, 'getApiSubcategories']);
@@ -140,6 +148,7 @@ Route::prefix('admin')
         
 
         Route::resource('products', ProductController::class);
+        Route::resource('solutions', SolutionController::class);
 
         Route::delete('/product-images/{id}', [ProductController::class, 'deleteImage'])->name('product-images.destroy');
 

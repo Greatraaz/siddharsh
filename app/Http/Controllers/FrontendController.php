@@ -6,6 +6,7 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\ChildCategory;
 use App\Models\Product;
+use App\Models\Solution;
 use App\Models\Subcategory;
 use App\Models\Enquiry;
 use App\Mail\AdminEnquiryMail;
@@ -72,34 +73,61 @@ class FrontendController extends Controller
     public function categoryProducts($slug)
     {
         $category = Category::where('slug', $slug)->firstOrFail();
-        $products = Product::with(['images', 'category', 'brand'])->where('category_id', $category->id)->where('status', 1)->paginate(12);
-        
         $brands = Brand::where('status', 1)->get();
         $categories = Category::with('subcategories.childCategories')->where('status', 1)->get();
+        $solutions = Solution::where('status', 1)->get();
         
-        return view('frontend.products', compact('products', 'category', 'brands', 'categories'));
+        $products = Product::with(['images', 'category', 'brand'])
+            ->where('category_id', $category->id)
+            ->where('status', 1)
+            ->when(request('solution'), function($q) {
+                $q->whereHas('solutions', function($sq) {
+                    $sq->where('slug', request('solution'));
+                });
+            })
+            ->paginate(12)->withQueryString();
+
+        return view('frontend.products', compact('products', 'category', 'brands', 'categories', 'solutions'));
     }
 
     public function subcategoryProducts($slug)
     {
         $subcategory = Subcategory::with('category')->where('slug', $slug)->firstOrFail();
-        $products = Product::with(['images', 'category', 'brand'])->where('subcategory_id', $subcategory->id)->where('status', 1)->paginate(12);
-        
         $brands = Brand::where('status', 1)->get();
         $categories = Category::with('subcategories.childCategories')->where('status', 1)->get();
+        $solutions = Solution::where('status', 1)->get();
+
+        $products = Product::with(['images', 'category', 'brand'])
+            ->where('subcategory_id', $subcategory->id)
+            ->where('status', 1)
+            ->when(request('solution'), function($q) {
+                $q->whereHas('solutions', function($sq) {
+                    $sq->where('slug', request('solution'));
+                });
+            })
+            ->paginate(12)->withQueryString();
         
-        return view('frontend.products', compact('products', 'subcategory', 'brands', 'categories'));
+        return view('frontend.products', compact('products', 'subcategory', 'brands', 'categories', 'solutions'));
     }
 
     public function childCategoryProducts($slug)
     {
         $childCategory = ChildCategory::with('subcategory.category')->where('slug', $slug)->firstOrFail();
-        $products = Product::with(['images', 'category', 'brand'])->where('child_category_id', $childCategory->id)->where('status', 1)->paginate(12);
-        
         $brands = Brand::where('status', 1)->get();
         $categories = Category::with('subcategories.childCategories')->where('status', 1)->get();
+        $solutions = Solution::where('status', 1)->get();
+
+        $products = Product::with(['images', 'category', 'brand'])
+            ->where('child_category_id', $childCategory->id)
+            ->where('status', 1)
+            ->when(request('solution'), function($q) {
+                $q->whereHas('solutions', function($sq) {
+                    $sq->where('slug', request('solution'));
+                });
+            })
+            ->paginate(12)->withQueryString();
         
-        return view('frontend.products', compact('products', 'childCategory', 'brands', 'categories'));
+        return view('frontend.products', compact('products', 'childCategory', 'brands', 'categories', 'solutions'));
     }
 
     public function brandDetails($slug)
@@ -117,38 +145,99 @@ class FrontendController extends Controller
     public function brandProducts($slug)
     {
         $brand = Brand::where('slug', $slug)->firstOrFail();
-        $products = Product::with(['images', 'category', 'brand'])->where('brand_id', $brand->id)->where('status', 1)->paginate(12);
-        
         $brands = Brand::where('status', 1)->get();
         $categories = Category::with('subcategories.childCategories')->where('status', 1)->get();
+        $solutions = Solution::where('status', 1)->get();
+
+        $products = Product::with(['images', 'category', 'brand'])
+            ->where('brand_id', $brand->id)
+            ->where('status', 1)
+            ->when(request('solution'), function($q) {
+                $q->whereHas('solutions', function($sq) {
+                    $sq->where('slug', request('solution'));
+                });
+            })
+            ->paginate(12)->withQueryString();
         
-        return view('frontend.products', compact('products', 'brand', 'brands', 'categories'));
+        return view('frontend.products', compact('products', 'brand', 'brands', 'categories', 'solutions'));
     }
 
     public function productDetails($slug)
     {
-        $product = Product::with(['brand', 'category', 'subcategory', 'childCategory', 'images'])->where('slug', $slug)->firstOrFail();
-        $relatedProducts = Product::where('category_id', $product->category_id)->where('id', '!=', $product->id)->take(4)->get();
+        $product = Product::with(['brand', 'category', 'subcategory', 'childCategory', 'images', 'solutions'])
+            ->where('slug', $slug)
+            ->firstOrFail();
+
+        $relatedProducts = Product::where('category_id', $product->category_id)
+            ->where('id', '!=', $product->id)
+            ->take(4)
+            ->get();
         
         return view('frontend.product_details', compact('product', 'relatedProducts'));
+    }
+
+    public function solutions()
+    {
+        $solutions = Solution::where('status', 1)->paginate(12);
+        return view('frontend.solutions', compact('solutions'));
+    }
+
+    public function solutionDetails($slug)
+    {
+        $solution = Solution::with(['products' => function($query) {
+            $query->where('status', 1)->with(['images', 'brand', 'category', 'subcategory'])->take(12);
+        }])->where('slug', $slug)->where('status', 1)->firstOrFail();
+
+        $relatedProducts = $solution->products;
+
+        $brands = $relatedProducts->pluck('brand')->filter()->unique('id');
+        $categories = $relatedProducts->pluck('category')->filter()->unique('id');
+
+        $featuredProducts = $solution->products()->where('status', 1)->where('featured', 1)
+            ->with(['images', 'brand'])
+            ->take(4)
+            ->get();
+
+        if ($featuredProducts->isEmpty()) {
+            $featuredProducts = Product::with(['images', 'brand'])->where('status', 1)->where('featured', 1)->take(4)->get();
+        }
+
+        return view('frontend.solution_detail', compact('solution', 'relatedProducts', 'brands', 'categories', 'featuredProducts'));
     }
 
     public function search(Request $request)
     {
         $query = $request->input('query');
-        $products = Product::with(['images', 'category', 'brand'])
-            ->where('status', 1)
-            ->where(function($q) use ($query) {
-                $q->where('name', 'LIKE', "%{$query}%")
-                  ->orWhere('short_description', 'LIKE', "%{$query}%")
-                  ->orWhere('tags', 'LIKE', "%{$query}%");
-            })
-            ->paginate(12);
-            
         $brands = Brand::where('status', 1)->get();
         $categories = Category::with('subcategories.childCategories')->where('status', 1)->get();
+        $solutions = Solution::where('status', 1)->get();
+
+        $products = Product::with(['images', 'category', 'brand'])
+            ->where('status', 1)
+            ->when($query, function($q) use ($query) {
+                $q->where(function($sub) use ($query) {
+                    $sub->where('name', 'LIKE', "%{$query}%")
+                        ->orWhere('variant', 'LIKE', "%{$query}%")
+                        ->orWhere('part_code', 'LIKE', "%{$query}%")
+                        ->orWhere('part_number', 'LIKE', "%{$query}%")
+                        ->orWhere('short_description', 'LIKE', "%{$query}%")
+                        ->orWhere('tags', 'LIKE', "%{$query}%")
+                        ->orWhereHas('brand', function($brandQuery) use ($query) {
+                            $brandQuery->where('name', 'LIKE', "%{$query}%");
+                        })
+                        ->orWhereHas('category', function($categoryQuery) use ($query) {
+                            $categoryQuery->where('name', 'LIKE', "%{$query}%");
+                        });
+                });
+            })
+            ->when(request('solution'), function($q) {
+                $q->whereHas('solutions', function($sq) {
+                    $sq->where('slug', request('solution'));
+                });
+            })
+            ->paginate(12)->withQueryString();
         
-        return view('frontend.products', compact('products', 'brands', 'categories', 'query'));
+        return view('frontend.products', compact('products', 'brands', 'categories', 'query', 'solutions'));
     }
 
     public function partList(Request $request)
@@ -169,9 +258,17 @@ class FrontendController extends Controller
         if ($query) {
             $products->where(function($q) use ($query) {
                 $q->where('name', 'LIKE', "%{$query}%")
+                  ->orWhere('variant', 'LIKE', "%{$query}%")
                   ->orWhere('part_code', 'LIKE', "%{$query}%")
+                  ->orWhere('part_number', 'LIKE', "%{$query}%")
                   ->orWhere('short_description', 'LIKE', "%{$query}%")
-                  ->orWhere('tags', 'LIKE', "%{$query}%");
+                  ->orWhere('tags', 'LIKE', "%{$query}%")
+                  ->orWhereHas('brand', function($sub) use ($query) {
+                      $sub->where('name', 'LIKE', "%{$query}%");
+                  })
+                  ->orWhereHas('category', function($sub) use ($query) {
+                      $sub->where('name', 'LIKE', "%{$query}%");
+                  });
             });
         } else {
             // If AJAX but no query, maybe return empty or all?
@@ -254,17 +351,23 @@ class FrontendController extends Controller
 
     public function futureProducts()
     {
+        $brands = Brand::where('status', 1)->get();
+        $categories = Category::where('status', 1)->get();
+        $solutions = Solution::where('status', 1)->get();
+        
         $products = Product::with(['images', 'category', 'brand'])
             ->where('is_future', 1)
             ->where('status', 1)
-            ->paginate(12);
+            ->when(request('solution'), function($q) {
+                $q->whereHas('solutions', function($sq) {
+                    $sq->where('slug', request('solution'));
+                });
+            })
+            ->paginate(12)->withQueryString();
             
-        $brands = Brand::where('status', 1)->get();
-        $categories = Category::where('status', 1)->get();
-        
         $pageTitle = "Future Products";
         
-        return view('frontend.products', compact('products', 'brands', 'categories', 'pageTitle'));
+        return view('frontend.products', compact('products', 'brands', 'categories', 'pageTitle', 'solutions'));
     }
     public function getApiFeaturedProducts()
     {

@@ -12,7 +12,7 @@ class ProductsExport implements FromQuery, WithHeadings, WithMapping
     public function query()
     {
         return Product::query()
-            ->with(['brand', 'category', 'subcategory', 'childCategory', 'images'])
+            ->with(['brand', 'category', 'subcategory', 'childCategory', 'images', 'solutions'])
             ->orderBy('id');
     }
 
@@ -26,14 +26,16 @@ class ProductsExport implements FromQuery, WithHeadings, WithMapping
             'name',
             'slug',
             'part_code',
+            'part_number',
             'thumbnail',
             'gallery_images',
             'tags',
             'short_description',
-            'full_description',
+            'variant',
             'specifications',
             'packaging',
             'additional_info',
+            'solutions',
             'featured',
             'is_future',
             'meta_title',
@@ -49,6 +51,7 @@ class ProductsExport implements FromQuery, WithHeadings, WithMapping
     public function map($product): array
     {
         $gallery = $product->images->pluck('image')->filter()->implode(', ');
+        $solutions = $product->solutions->pluck('name')->filter()->implode(', ');
 
         return [
             $product->brand->name ?? '',
@@ -58,14 +61,16 @@ class ProductsExport implements FromQuery, WithHeadings, WithMapping
             $product->name,
             $product->slug,
             $product->part_code ?? '',
+            $product->part_number ?? '',
             $product->thumbnail ?? '',
             $gallery,
             $product->tags ?? '',
             $product->short_description ?? '',
-            $product->full_description ?? '',
+            $product->variant ?? '',
             $product->specifications ?? '',
             $product->packaging ?? '',
             $product->additional_info ?? '',
+            $solutions,
             $product->featured ? 1 : 0,
             $product->is_future ? 1 : 0,
             $product->meta_title ?? '',

@@ -19,10 +19,11 @@ class Product extends Model
         'name',
         'slug',
         'part_code',
+        'part_number',
         'thumbnail',
 
         'short_description',
-        'full_description',
+        'variant',
         'specifications',
 
         'tags',
@@ -57,6 +58,11 @@ class Product extends Model
     public function images()
     {
         return $this->hasMany(ProductImage::class);
+    }
+
+    public function solutions()
+    {
+        return $this->belongsToMany(Solution::class);
     }
 
     public function childCategory()

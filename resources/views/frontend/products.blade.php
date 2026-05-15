@@ -70,6 +70,7 @@
                         <h3 class="sidebar-widget-title" style="border-bottom:none; margin-bottom: 8px;">Part Lookup</h3>
                         <p class="fs-xs text-muted mb-3">Lookup by Model or SKU</p>
                         <form action="{{ route('search') }}" method="GET">
+                            <input type="hidden" name="solution" value="{{ request('solution') }}">
                             <div class="sidebar-search">
                                 <i class="fas fa-barcode sidebar-search-icon"></i>
                                 <input type="text" name="query" value="{{ $query ?? '' }}" class="sidebar-search-input" placeholder="Part No...">
@@ -80,7 +81,7 @@
 
                     {{-- Categories Filter --}}
                     <div class="sidebar-widget mt-4 p-4 shadow-sm bg-white" style="border-radius: 16px; border: 1px solid var(--border-light);">
-                        <h3 class="sidebar-widget-title">Solutions</h3>
+                        <h3 class="sidebar-widget-title">Categories</h3>
                         <div class="accordion accordion-flush" id="catAccordion">
                             @foreach($categories as $cat)
                             <div class="sidebar-acc-item">
@@ -92,7 +93,7 @@
                                 </button>
                                 <div id="catCollapse{{ $cat->id }}" class="collapse {{ (isset($category) && $category->id == $cat->id) || (isset($subcategory) && $subcategory->category_id == $cat->id) ? 'show' : '' }}">
                                     <div class="sidebar-acc-body">
-                                        <a href="{{ route('category.subcategories', $cat->slug) }}" class="sidebar-cat-all">View All {{ $cat->name }}</a>
+                                        <a href="{{ route('category.products', $cat->slug) }}" class="sidebar-cat-all">View All {{ $cat->name }}</a>
                                         @foreach($cat->subcategories as $sub)
                                         <a href="{{ route('subcategory.products', $sub->slug) }}" class="sidebar-sub-link {{ isset($subcategory) && $subcategory->id == $sub->id ? 'active' : '' }}">
                                             {{ $sub->name }}
@@ -104,6 +105,27 @@
                             @endforeach
                         </div>
                     </div>
+
+                    {{-- Real Solutions Filter --}}
+                    @if(isset($solutions) && $solutions->count() > 0)
+                    <div class="sidebar-widget mt-4 p-4 shadow-sm bg-white" style="border-radius: 16px; border: 1px solid var(--border-light);">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h3 class="sidebar-widget-title mb-0" style="border-bottom:none; padding-bottom:0;">Solutions</h3>
+                            @if(request('solution'))
+                                <a href="{{ request()->fullUrlWithQuery(['solution' => null]) }}" class="text-danger fs-xs fw-bold" style="text-decoration:none;">Clear</a>
+                            @endif
+                        </div>
+                        <div class="sidebar-solutions-list d-flex flex-column gap-1">
+                            @foreach($solutions as $sol)
+                            <a href="{{ request()->fullUrlWithQuery(['solution' => $sol->slug]) }}" 
+                               class="sidebar-sol-link {{ request('solution') == $sol->slug ? 'active' : '' }}">
+                                <i class="fas fa-check-circle me-2 {{ request('solution') == $sol->slug ? 'text-primary' : 'text-light' }}" style="font-size: 0.7rem;"></i>
+                                {{ $sol->name }}
+                            </a>
+                            @endforeach
+                        </div>
+                    </div>
+                    @endif
 
                     {{-- Brands Filter --}}
                     <div class="sidebar-widget mt-4 p-4 shadow-sm bg-white" style="border-radius: 16px; border: 1px solid var(--border-light);">
@@ -308,6 +330,31 @@
 .sidebar-child-link i { font-size: 0.45rem; }
 .sidebar-child-link:hover,
 .sidebar-child-link.active { color: var(--primary); background: var(--primary-soft); }
+
+/* Solutions Link Style */
+.sidebar-sol-link {
+    display: flex;
+    align-items: center;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    padding: 8px 10px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    border: 1px solid transparent;
+}
+.sidebar-sol-link:hover {
+    background: var(--primary-soft);
+    color: var(--primary);
+}
+.sidebar-sol-link.active {
+    background: var(--primary-soft);
+    color: var(--primary);
+    font-weight: 700;
+    border-color: rgba(79, 70, 229, 0.1);
+}
+.fs-xs { font-size: 0.75rem !important; }
 
 /* Brands grid */
 .sidebar-brands-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }

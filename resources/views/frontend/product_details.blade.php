@@ -90,7 +90,7 @@
 
                     {{-- Title --}}
                     <h1 class="pd-title">{{ $product->name }}</h1>
-
+                    <h4>{{ $product->tags }}</h4>
                     {{-- Category Path --}}
                     <div class="pd-cat-path">
                         @if($product->category)
@@ -106,6 +106,18 @@
                         @endif
                     </div>
 
+                    @if($product->solutions->count())
+                    <div class="pd-solution-box mb-4">
+                        <span class="pd-solution-label text-uppercase fw-bold" style="font-size:0.8rem; letter-spacing:0.08em; color:#5f5f5f;">Solution</span>
+                        <div class="d-flex flex-wrap gap-2 mt-2">
+                            @foreach($product->solutions as $solution)
+                                <a href="{{ route('solutions.show', $solution->slug) }}" class="badge bg-light text-dark py-2 px-3 fw-600" style="text-decoration:none;">
+                                    {{ $solution->name }}
+                                </a>
+                            @endforeach
+                        </div>
+                    </div>
+                    @endif
 
                     {{-- Short Description --}}
                     @if($product->short_description)
@@ -120,7 +132,7 @@
                             <div class="col-6">
                                 <div class="pd-qs-item">
                                     <span class="pd-qs-label">Part No.</span>
-                                    <span class="pd-qs-val">{{ strtoupper(substr($product->slug, 0, 8)) }}</span>
+                                    <span class="pd-qs-val">{{ $product->part_code }}</span>
                                 </div>
                             </div>
                             <div class="col-6">

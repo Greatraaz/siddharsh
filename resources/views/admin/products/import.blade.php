@@ -19,40 +19,43 @@
         </div>
     </div>
 
-    <div class="row g-4">
+    <div class="row g-4 mb-4">
         <div class="col-lg-7">
-            <div class="card border-0 shadow-sm rounded-4">
-                <div class="card-body p-4">
-                    <form id="product-import-form">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-body p-4 d-flex flex-column">
+                    <h5 class="fw-bold mb-4"><i class="fa-solid fa-upload text-primary me-2"></i>Upload Files</h5>
+                    <form id="product-import-form" class="flex-grow-1 d-flex flex-column">
                         @csrf
-                        <div class="row g-4">
-                            <div class="col-md-6">
+                        <div class="row g-4 flex-grow-1">
+                            <div class="col-md-6 d-flex flex-column">
                                 <label class="form-label fw-semibold">Excel file (.xlsx)</label>
-                                <div class="drop-zone border border-2 border-dashed rounded-4 p-4 text-center bg-light-subtle" data-target="excel">
-                                    <i class="fa-solid fa-file-excel fa-2x text-success mb-2"></i>
-                                    <p class="mb-1 small text-muted">Drag & drop or click to choose</p>
-                                    <p class="mb-0 small fw-semibold text-dark" id="excel-filename">No file selected</p>
+                                <div class="drop-zone border border-2 border-dashed rounded-4 p-5 text-center bg-light-subtle flex-grow-1 d-flex flex-column align-items-center justify-content-center" data-target="excel" style="min-height: 250px;">
+                                    <i class="fa-solid fa-file-excel fa-3x text-success mb-3"></i>
+                                    <p class="mb-1 fw-bold text-dark">Drag & drop spreadsheet</p>
+                                    <p class="mb-3 small text-muted">or click to browse files</p>
+                                    <div class="badge bg-white text-dark border px-3 py-2 rounded-pill shadow-sm" id="excel-filename">No file selected</div>
                                     <input type="file" name="excel" id="input-excel" class="d-none" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
                                 </div>
-                                <small class="text-muted">Max 50 MB. Must match the template headers.</small>
+                                <small class="text-muted mt-2">Max 50 MB. Must match the template headers.</small>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-6 d-flex flex-column">
                                 <label class="form-label fw-semibold">Images (.zip)</label>
-                                <div class="drop-zone border border-2 border-dashed rounded-4 p-4 text-center bg-light-subtle" data-target="zip">
-                                    <i class="fa-solid fa-file-zipper fa-2x text-warning mb-2"></i>
-                                    <p class="mb-1 small text-muted">Drag & drop or click to choose</p>
-                                    <p class="mb-0 small fw-semibold text-dark" id="zip-filename">No file selected</p>
+                                <div class="drop-zone border border-2 border-dashed rounded-4 p-5 text-center bg-light-subtle flex-grow-1 d-flex flex-column align-items-center justify-content-center" data-target="zip" style="min-height: 250px;">
+                                    <i class="fa-solid fa-file-zipper fa-3x text-warning mb-3"></i>
+                                    <p class="mb-1 fw-bold text-dark">Drag & drop ZIP archive</p>
+                                    <p class="mb-3 small text-muted">or click to browse files</p>
+                                    <div class="badge bg-white text-dark border px-3 py-2 rounded-pill shadow-sm" id="zip-filename">No file selected</div>
                                     <input type="file" name="zip" id="input-zip" class="d-none" accept=".zip,application/zip">
                                 </div>
-                                <small class="text-muted">Max 500 MB. Filenames must match thumbnail / gallery columns.</small>
+                                <small class="text-muted mt-2">Max 500 MB. Filenames must match columns.</small>
                             </div>
                         </div>
 
                         <div id="client-error" class="alert alert-danger mt-4 d-none" role="alert"></div>
 
                         <div class="d-flex justify-content-end mt-4">
-                            <button type="submit" class="btn btn-primary rounded-pill px-5" id="btn-submit">
-                                <i class="fa-solid fa-cloud-arrow-up me-1"></i> Start import
+                            <button type="submit" class="btn btn-primary rounded-pill px-5 py-3" id="btn-submit">
+                                <i class="fa-solid fa-cloud-arrow-up me-2"></i> Start Processing Import
                             </button>
                         </div>
                     </form>
@@ -62,89 +65,88 @@
                             <span class="fw-semibold" id="progress-label">Preparing…</span>
                             <span class="text-muted small" id="progress-count"></span>
                         </div>
-                        <div class="progress rounded-pill" style="height: 10px;">
+                        <div class="progress rounded-pill" style="height: 12px;">
                             <div class="progress-bar progress-bar-striped progress-bar-animated" id="progress-bar" role="progressbar" style="width: 0%"></div>
                         </div>
-                        <p class="small text-muted mt-2 mb-0" id="progress-hint">Ensure <code>php artisan queue:work</code> is running for background processing.</p>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="col-lg-5">
-            <div class="card border-0 shadow-sm rounded-4 mb-4">
-                <div class="card-header bg-white">
-                    <span class="fw-semibold"><i class="fa-solid fa-list-check text-primary me-2"></i>How to Import Products</span>
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-header bg-white py-3 border-0">
+                    <span class="fw-bold fs-5"><i class="fa-solid fa-list-check text-primary me-2"></i>How to Import Products</span>
                 </div>
                 <div class="card-body">
-                    <div class="mb-3">
-                        <div class="d-flex align-items-center mb-2">
-                            <span class="badge bg-primary rounded-circle me-2" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">1</span>
-                            <span class="fw-bold">Download Template</span>
+                    <div class="import-steps">
+                        <div class="d-flex gap-3 mb-4">
+                            <div class="step-num bg-primary-subtle text-primary fw-bold rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; flex-shrink: 0;">1</div>
+                            <div>
+                                <h6 class="fw-bold mb-1">Download Template</h6>
+                                <p class="small text-muted mb-0">Use our standard format to ensure data maps correctly to the database.</p>
+                            </div>
                         </div>
-                        <p class="small text-muted mb-0">Click the "Download template" button to get the correct Excel format.</p>
-                    </div>
-                    <div class="mb-3">
-                        <div class="d-flex align-items-center mb-2">
-                            <span class="badge bg-primary rounded-circle me-2" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">2</span>
-                            <span class="fw-bold">Fill Spreadsheet</span>
+                        <div class="d-flex gap-3 mb-4">
+                            <div class="step-num bg-primary-subtle text-primary fw-bold rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; flex-shrink: 0;">2</div>
+                            <div>
+                                <h6 class="fw-bold mb-1">Fill Product Data</h6>
+                                <p class="small text-muted mb-0">Brand, Category, and Subcategory names must match exactly. Existing products will be updated by name.</p>
+                            </div>
                         </div>
-                        <p class="small text-muted mb-0">Fill in product details. Brand, Category, and Subcategory names must match exactly. <strong>If a product with the same name exists, it will be updated.</strong></p>
-                    </div>
-                    <div class="mb-3">
-                        <div class="d-flex align-items-center mb-2">
-                            <span class="badge bg-primary rounded-circle me-2" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">3</span>
-                            <span class="fw-bold">Prepare Images ZIP</span>
+                        <div class="d-flex gap-3 mb-4">
+                            <div class="step-num bg-primary-subtle text-primary fw-bold rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; flex-shrink: 0;">3</div>
+                            <div>
+                                <h6 class="fw-bold mb-1">Zip Your Images</h6>
+                                <p class="small text-muted mb-0">ZIP images together. Filenames must match the <code>thumbnail</code> and <code>gallery_images</code> columns.</p>
+                            </div>
                         </div>
-                        <p class="small text-muted mb-2">Create a <code>.zip</code> file containing all product images. </p>
-                        <ul class="small text-muted ps-3 mb-0">
-                            <li><strong>Structure</strong>: You can put images directly in the ZIP or inside folders. The system will find them.</li>
-                            <li><strong>Matching</strong>: Filenames inside the ZIP must match the <code>thumbnail</code> and <code>gallery_images</code> columns in your Excel exactly.</li>
-                            <li><strong>Renaming</strong>: Images will be automatically renamed to <code>[slug]_[date]_thumbnail</code> and <code>[slug]_[date]_gallery_[index]</code> upon import.</li>
-                        </ul>
-                    </div>
-                    <div class="mb-3">
-                        <div class="d-flex align-items-center mb-2">
-                            <span class="badge bg-primary rounded-circle me-2" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">4</span>
-                            <span class="fw-bold">Upload & Start</span>
+                        <div class="d-flex gap-3 mb-4">
+                            <div class="step-num bg-primary-subtle text-primary fw-bold rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; flex-shrink: 0;">4</div>
+                            <div>
+                                <h6 class="fw-bold mb-1">Upload & Import</h6>
+                                <p class="small text-muted mb-0">Select both files and start. Processing runs in the background via queues.</p>
+                            </div>
                         </div>
-                        <p class="small text-muted mb-0">Select both the Excel and ZIP files, then click "Start import".</p>
-                    </div>
-                    <div class="mb-0">
-                        <div class="d-flex align-items-center mb-2">
-                            <span class="badge bg-primary rounded-circle me-2" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">5</span>
-                            <span class="fw-bold">Monitor Progress</span>
+                        <div class="alert alert-info border-0 rounded-3 mb-0 small">
+                            <i class="fa-solid fa-circle-info me-2"></i> Make sure <code>php artisan queue:work</code> is running on the server to process background jobs.
                         </div>
-                        <p class="small text-muted mb-0">Wait for the process to complete. Any errors or skipped rows will appear in the log below.</p>
                     </div>
                 </div>
             </div>
-            <div class="card border-0 shadow-sm rounded-4 mb-4">
-                <div class="card-header bg-white">
-                    <span class="fw-semibold"><i class="fa-solid fa-circle-info text-primary me-2"></i>Columns</span>
-                </div>
-                <div class="card-body small">
-                    <p class="text-muted">Required: <strong>category</strong>, <strong>sub_category</strong>, <strong>name</strong>. Match brand, category, subcategory, and child category names exactly (case-insensitive).</p>
-                    <p class="text-muted mb-0"><strong>part_code</strong> is optional in the sheet; unique values are enforced. Leave blank to auto-generate <code>IMP-…</code> codes. Duplicates are detected by <strong>name</strong>, <strong>slug</strong>, and <strong>part_code</strong>.</p>
-                </div>
-            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
             <div class="card border-0 shadow-sm rounded-4">
-                <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                    <span class="fw-semibold">Skipped rows log</span>
-                    <span class="badge bg-secondary" id="error-badge">0</span>
+                <div class="card-header bg-white d-flex flex-wrap justify-content-between align-items-center py-3 border-0">
+                    <span class="fw-bold fs-5"><i class="fa-solid fa-clock-rotate-left text-primary me-2"></i>Import Results & Logs</span>
+                    <div class="d-flex gap-2">
+                        <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill" id="imported-badge">0 imported</span>
+                        <span class="badge bg-warning-subtle text-warning px-3 py-2 rounded-pill" id="warning-badge">0 warnings</span>
+                        <span class="badge bg-danger-subtle text-danger px-3 py-2 rounded-pill" id="skipped-badge">0 skipped</span>
+                        <span class="badge bg-dark-subtle text-dark px-3 py-2 rounded-pill" id="failed-badge">0 failed</span>
+                    </div>
                 </div>
                 <div class="card-body p-0">
-                    <div class="table-responsive" style="max-height: 320px;">
-                        <table class="table table-sm table-hover mb-0">
+                    <div class="table-responsive" style="max-height: 500px;">
+                        <table class="table table-hover mb-0 align-middle">
                             <thead class="table-light sticky-top">
                                 <tr>
-                                    <th style="width: 72px;">Row</th>
-                                    <th>Reason</th>
+                                    <th style="width: 80px;" class="ps-4">Row</th>
+                                    <th style="width: 120px;">Status</th>
+                                    <th style="width: 150px;">Part Code</th>
+                                    <th>Product Name</th>
+                                    <th>Message / Error Details</th>
                                 </tr>
                             </thead>
-                            <tbody id="error-rows">
-                                <tr id="error-empty">
-                                    <td colspan="2" class="text-muted text-center py-4">No row errors yet</td>
+                            <tbody id="result-rows">
+                                <tr id="result-empty">
+                                    <td colspan="5" class="text-muted text-center py-5">
+                                        <i class="fa-solid fa-inbox fa-3x mb-3 d-block opacity-25"></i>
+                                        No import results to display yet. Start an import to see live logs.
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -170,9 +172,12 @@
     const progressBar = document.getElementById('progress-bar');
     const progressLabel = document.getElementById('progress-label');
     const progressCount = document.getElementById('progress-count');
-    const errorRows = document.getElementById('error-rows');
-    const errorEmpty = document.getElementById('error-empty');
-    const errorBadge = document.getElementById('error-badge');
+    const resultRows = document.getElementById('result-rows');
+    const resultEmpty = document.getElementById('result-empty');
+    const importedBadge = document.getElementById('imported-badge');
+    const warningBadge = document.getElementById('warning-badge');
+    const skippedBadge = document.getElementById('skipped-badge');
+    const failedBadge = document.getElementById('failed-badge');
     const statusUrl = @json(url('/admin/products/import/status'));
     const submitUrl = @json(route('admin.products.import.submit'));
     const csrf = form.querySelector('input[name="_token"]').value;
@@ -241,19 +246,32 @@
         return true;
     }
 
-    function renderErrors(errors) {
-        const list = errors || [];
-        errorBadge.textContent = list.length;
-        errorRows.querySelectorAll('tr:not(#error-empty)').forEach((r) => r.remove());
-        if (!list.length) {
-            errorEmpty.classList.remove('d-none');
+    function renderResults(data) {
+        const logs = data.detailed_logs || [];
+        importedBadge.textContent = (data.imported_rows || 0) + ' imported';
+        warningBadge.textContent = (data.warning_rows || 0) + ' warnings';
+        skippedBadge.textContent = (data.skipped_rows || 0) + ' skipped';
+        failedBadge.textContent = (data.failed_rows || 0) + ' failed';
+
+        resultRows.querySelectorAll('tr:not(#result-empty)').forEach((r) => r.remove());
+        if (!logs.length) {
+            resultEmpty.classList.remove('d-none');
             return;
         }
-        errorEmpty.classList.add('d-none');
-        list.slice(-100).forEach((e) => {
+        resultEmpty.classList.add('d-none');
+        logs.slice(-100).forEach((log) => {
             const tr = document.createElement('tr');
-            tr.innerHTML = '<td>' + (e.row != null ? e.row : '—') + '</td><td>' + escapeHtml(e.message) + '</td>';
-            errorRows.appendChild(tr);
+            const statusClass = log.status === 'skipped' ? 'text-danger' :
+                               log.status === 'failed' ? 'text-dark' :
+                               log.status === 'warning' ? 'text-warning' : 'text-muted';
+            tr.innerHTML = `
+                <td>${log.row || '—'}</td>
+                <td><span class="badge ${statusClass}">${log.status}</span></td>
+                <td><code>${escapeHtml(log.part_code || '')}</code></td>
+                <td>${escapeHtml(log.product_name || '')}</td>
+                <td>${escapeHtml(log.message || '')}</td>
+            `;
+            resultRows.appendChild(tr);
         });
     }
 
@@ -269,16 +287,18 @@
         progressBar.setAttribute('aria-valuenow', pct);
         const parts = [];
         if (data.total_rows) {
-            parts.push((data.imported_rows + data.skipped_rows) + ' / ' + data.total_rows);
+            parts.push((data.imported_rows + data.skipped_rows + (data.failed_rows || 0)) + ' / ' + data.total_rows);
         }
         parts.push(data.imported_rows + ' imported');
         if (data.skipped_rows) parts.push(data.skipped_rows + ' skipped');
+        if (data.failed_rows) parts.push(data.failed_rows + ' failed');
+        if (data.warning_rows) parts.push(data.warning_rows + ' warnings');
         progressCount.textContent = parts.join(' · ');
         if (data.status === 'pending') progressLabel.textContent = 'Queued…';
         else if (data.status === 'processing') progressLabel.textContent = 'Importing…';
         else if (data.status === 'completed') progressLabel.textContent = 'Completed';
         else if (data.status === 'failed') progressLabel.textContent = 'Failed';
-        renderErrors(data.errors);
+        renderResults(data);
     }
 
     function poll(importId) {
@@ -323,7 +343,7 @@
         progressBar.style.width = '0%';
         progressLabel.textContent = 'Uploading…';
         progressCount.textContent = '';
-        renderErrors([]);
+        renderResults({detailed_logs: []});
 
         const body = new FormData(form);
 
