@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Models\Solution;
 use App\Models\Subcategory;
 use App\Models\Enquiry;
+use App\Models\Newsletter;
 use App\Mail\AdminEnquiryMail;
 use App\Mail\UserEnquiryMail;
 use Illuminate\Http\Request;
@@ -376,5 +377,123 @@ class FrontendController extends Controller
             ->get(['id', 'name', 'slug']);
             
         return response()->json($products);
+    }
+
+    // SEO Landing Pages
+    public function panduitLanding()
+    {
+        $panduitProducts = Product::with(['images', 'category', 'brand'])
+            ->where('status', 1)
+            ->whereHas('brand', function($query) {
+                $query->where('name', 'LIKE', '%panduit%');
+            })
+            ->take(8)
+            ->get();
+
+        $structuredCablingProducts = Product::with(['images', 'category', 'brand'])
+            ->where('status', 1)
+            ->where('name', 'LIKE', '%cabl%')
+            ->take(8)
+            ->get();
+
+        return view('frontend.landing.panduit', compact('panduitProducts', 'structuredCablingProducts'));
+    }
+
+    public function legrandLanding()
+    {
+        $legrandProducts = Product::with(['images', 'category', 'brand'])
+            ->where('status', 1)
+            ->whereHas('brand', function($query) {
+                $query->where('name', 'LIKE', '%legrand%');
+            })
+            ->take(8)
+            ->get();
+
+        $electricalProducts = Product::with(['images', 'category', 'brand'])
+            ->where('status', 1)
+            ->where('name', 'LIKE', '%electrical%')
+            ->take(8)
+            ->get();
+
+        return view('frontend.landing.legrand', compact('legrandProducts', 'electricalProducts'));
+    }
+
+    public function structuredCablingLanding()
+    {
+        $cablingProducts = Product::with(['images', 'category', 'brand'])
+            ->where('status', 1)
+            ->where(function($query) {
+                $query->where('name', 'LIKE', '%cabl%')
+                      ->orWhere('name', 'LIKE', '%fiber%')
+                      ->orWhere('name', 'LIKE', '%optic%');
+            })
+            ->take(12)
+            ->get();
+
+        $brands = Brand::where('status', 1)->get();
+        $categories = Category::with('subcategories.childCategories')->where('status', 1)->get();
+
+        return view('frontend.landing.structured-cabling', compact('cablingProducts', 'brands', 'categories'));
+    }
+
+    public function datacenterLanding()
+    {
+        $datacenterProducts = Product::with(['images', 'category', 'brand'])
+            ->where('status', 1)
+            ->where(function($query) {
+                $query->where('name', 'LIKE', '%datacenter%')
+                      ->orWhere('name', 'LIKE', '%rack%')
+                      ->orWhere('name', 'LIKE', '%server%')
+                      ->orWhere('name', 'LIKE', '%cable management%');
+            })
+            ->take(12)
+            ->get();
+
+        $brands = Brand::where('status', 1)->get();
+        $categories = Category::with('subcategories.childCategories')->where('status', 1)->get();
+
+        return view('frontend.landing.datacenter', compact('datacenterProducts', 'brands', 'categories'));
+    }
+
+    public function itInfrastructureLanding()
+    {
+        $infrastructureProducts = Product::with(['images', 'category', 'brand'])
+            ->where('status', 1)
+            ->where('featured', 1)
+            ->take(16)
+            ->get();
+
+        $brands = Brand::where('status', 1)->take(8)->get();
+        $categories = Category::with('subcategories.childCategories')->where('status', 1)->take(6)->get();
+        $solutions = Solution::where('status', 1)->take(4)->get();
+
+        return view('frontend.landing.it-infrastructure', compact('infrastructureProducts', 'brands', 'categories', 'solutions'));
+    }
+
+    public function newsletterSubmit(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|max:255',
+        ]);
+
+        $exists = Newsletter::where('email', $request->email)->first();
+        if ($exists) {
+            return response()->json([
+                'status'  => 'info',
+                'message' => 'You are already subscribed to our newsletter!'
+            ]);
+        }
+
+        Newsletter::create([
+            'email'  => $request->email,
+            'status' => 1
+        ]);
+
+        // Note: You can integrate Mailchimp here later using an API or a package like spatie/laravel-newsletter
+        
+        return response()->json([
+            'status'  => 'success',
+            'message' => 'Thank you for subscribing to our newsletter!'
+        ]);
     }
 }

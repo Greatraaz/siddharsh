@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SolutionController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\NewsletterController;
 
 /*
 |--------------------------------------------------------------------------
@@ -43,12 +44,19 @@ Route::get('/search', [FrontendController::class, 'search'])->name('search');
 Route::get('/part-list', [FrontendController::class, 'partList'])->name('part.list');
 Route::get('/contact-us', [FrontendController::class, 'contact'])->name('contact');
 Route::post('/enquiry/submit', [FrontendController::class, 'enquirySubmit'])->name('enquiry.submit');
+Route::post('/newsletter/submit', [FrontendController::class, 'newsletterSubmit'])->name('newsletter.submit');
 Route::get('/thank-you', [FrontendController::class, 'thankYou'])->name('thank.you');
 Route::get('/future-products', [FrontendController::class, 'futureProducts'])->name('future.products');
 Route::get('/solutions', [FrontendController::class, 'solutions'])->name('solutions.index');
 Route::get('/solutions/{slug}', [FrontendController::class, 'solutionDetails'])->name('solutions.show');
 
-// AJAX routes for mega menu
+// SEO Landing Pages
+Route::get('/panduit-distributor-india', [FrontendController::class, 'panduitLanding'])->name('panduit.distributor');
+Route::get('/panduit-distributor-india/', [FrontendController::class, 'panduitLanding']);
+Route::get('/legrand-distributor-india', [FrontendController::class, 'legrandLanding'])->name('legrand.distributor');
+Route::get('/structured-cabling-solutions-india', [FrontendController::class, 'structuredCablingLanding'])->name('structured.cabling');
+Route::get('/datacenter-solutions-india', [FrontendController::class, 'datacenterLanding'])->name('datacenter.solutions');
+Route::get('/it-infrastructure-solutions-india', [FrontendController::class, 'itInfrastructureLanding'])->name('it.infrastructure');
 Route::get('/apisubcategories/{category_id}', [FrontendController::class, 'getApiSubcategories']);
 Route::get('/apichildcategories/{subcategory_id}', [FrontendController::class, 'getApiChildcategories']);
 Route::get('/apifeatured-products', [FrontendController::class, 'getApiFeaturedProducts']);
@@ -160,6 +168,7 @@ Route::prefix('admin')
 
         Route::resource('roles', RoleController::class);
         Route::resource('users', UserController::class);
+        Route::resource('newsletters', NewsletterController::class);
 
         /*
         |--------------------------------------------------------------------------

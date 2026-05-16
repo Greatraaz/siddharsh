@@ -745,7 +745,7 @@
             margin: 0 auto 15px;
         }
         .loader-logo {
-            max-height: 60px;
+            max-height: 90px;
             width: auto;
             animation: pulse 1.5s ease-in-out infinite;
             margin: 0 auto;
@@ -804,6 +804,7 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
         // ── Scroll Reveal ──────────────────────────────────────────

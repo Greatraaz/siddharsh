@@ -50,7 +50,7 @@
         <div class="container-fluid px-4">
             <div class="nav-inner">
                 {{-- Logo --}}
-                <a href="{{ route('home') }}" class="nav-logo" aria-label="Siddharsh Home">
+                <a href="https://siddharsh.com/" class="nav-logo" aria-label="Siddharsh Home">
                     @if($headerSettings && $headerSettings->logo)
                         <img src="{{ asset('uploads/settings/'.$headerSettings->logo) }}" alt="{{ $headerSettings->site_title ?? 'Siddharsh' }}" style="height:54px;width:auto;object-fit:contain;">
                     @else
@@ -58,76 +58,72 @@
                     @endif
                 </a>
 
-                {{-- Search next to logo --}}
-                <form action="{{ route('search') }}" method="GET" class="header-search-form d-none d-lg-flex align-items-center ms-4 me-4">
+                {{-- Search Bar --}}
+                <form action="{{ route('search') }}" method="GET" class="header-search-form d-flex align-items-center">
                     <input type="text" name="query" value="{{ request('query') }}" class="header-search-input" placeholder="Keyword, Part Number or Cross-Reference" autocomplete="off">
                     <button type="submit" class="header-search-btn"><i class="fas fa-search"></i></button>
                 </form>
 
                 {{-- Desktop Menu --}}
-                <div class="nav-menu-wrapper d-none d-lg-flex">
+                <div class="nav-menu-wrapper d-flex">
                     <ul class="nav-menu" id="desktopMenu">
-                        <li class="nav-item has-dropdown">
+                        <li class="nav-item has-mega">
                             <a href="https://siddharsh.com/about-us/" class="nav-link-item">
                                 About us <i class="fas fa-chevron-down nav-arrow"></i>
                             </a>
-                            <div class="nav-dropdown about-dropdown">
-                                <div class="about-dropdown-links">
-                                    <div class="dropdown-col">
-                                        <a href="https://siddharsh.com/about-us/#who-we-are" class="nav-dropdown-link">
-                                            <span class="nav-dropdown-icon"><i class="fas fa-users"></i></span>
-                                            <span>Who We Are</span>
-                                        </a>
-                                        <a href="https://siddharsh.com/about-us/#mission-and-vision" class="nav-dropdown-link">
-                                            <span class="nav-dropdown-icon"><i class="fas fa-eye"></i></span>
-                                            <span>Mission and Vision</span>
-                                        </a>
-                                        <a href="https://siddharsh.com/about-us/#why-choose-us" class="nav-dropdown-link">
-                                            <span class="nav-dropdown-icon"><i class="fas fa-handshake"></i></span>
-                                            <span>Why Choose Us</span>
-                                        </a>
-                                        <a href="https://siddharsh.com/about-us/#investor-relations" class="nav-dropdown-link">
-                                            <span class="nav-dropdown-icon"><i class="fas fa-chart-line"></i></span>
-                                            <span>Investor Relations</span>
-                                        </a>
-                                        <a href="https://siddharsh.com/about-us/#bicsi-member" class="nav-dropdown-link">
-                                            <span class="nav-dropdown-icon"><i class="fas fa-certificate"></i></span>
-                                            <span>BICSI Member</span>
-                                        </a>
+                            <div class="mega-menu about-mega">
+                                <div class="mega-links-area">
+                                    <div class="mega-header">
+                                        <span class="mega-header-label">CORPORATE</span>
+                                        <h3 class="mega-header-title">About Siddharsh</h3>
                                     </div>
-                                    <div class="dropdown-col">
-                                        <a href="https://siddharsh.com/about-us/#siddharsh-promise" class="nav-dropdown-link">
-                                            <span class="nav-dropdown-icon"><i class="fas fa-lightbulb"></i></span>
-                                            <span>Siddharsh Promise</span>
+                                    <div class="mega-grid-2-cols">
+                                        <a href="https://siddharsh.com/about-us/#who-we-are" class="mega-link-card">
+                                            <div class="mega-link-icon"><i class="fas fa-users"></i></div>
+                                            <span class="mega-link-title">Who We Are</span>
                                         </a>
-                                        <a href="https://siddharsh.com/about-us/#our-team" class="nav-dropdown-link">
-                                            <span class="nav-dropdown-icon"><i class="fas fa-users"></i></span>
-                                            <span>Our Team</span>
+                                        <a href="https://siddharsh.com/about-us/#siddharsh-promise" class="mega-link-card">
+                                            <div class="mega-link-icon"><i class="fas fa-lightbulb"></i></div>
+                                            <span class="mega-link-title">Siddharsh Promise</span>
                                         </a>
-                                        <a href="https://siddharsh.com/about-us/#siddharsh-advantage" class="nav-dropdown-link">
-                                            <span class="nav-dropdown-icon"><i class="fas fa-award"></i></span>
-                                            <span>Siddharsh Advantage</span>
+                                        <a href="https://siddharsh.com/about-us/#mission-and-vision" class="mega-link-card">
+                                            <div class="mega-link-icon"><i class="fas fa-eye"></i></div>
+                                            <span class="mega-link-title">Mission and Vision</span>
                                         </a>
-                                        <a href="https://siddharsh.com/about-us/#career" class="nav-dropdown-link">
-                                            <span class="nav-dropdown-icon"><i class="fas fa-briefcase"></i></span>
-                                            <span>Career</span>
+                                        <a href="https://siddharsh.com/about-us/#our-team" class="mega-link-card">
+                                            <div class="mega-link-icon"><i class="fas fa-user-friends"></i></div>
+                                            <span class="mega-link-title">Our Team</span>
+                                        </a>
+                                        <a href="https://siddharsh.com/about-us/#why-choose-us" class="mega-link-card">
+                                            <div class="mega-link-icon"><i class="fas fa-check-circle"></i></div>
+                                            <span class="mega-link-title">Why Choose Us</span>
+                                        </a>
+                                        <a href="https://siddharsh.com/about-us/#siddharsh-advantage" class="mega-link-card">
+                                            <div class="mega-link-icon"><i class="fas fa-award"></i></div>
+                                            <span class="mega-link-title">Siddharsh Advantage</span>
+                                        </a>
+                                        <a href="https://siddharsh.com/about-us/#investor-relations" class="mega-link-card">
+                                            <div class="mega-link-icon"><i class="fas fa-chart-line"></i></div>
+                                            <span class="mega-link-title">Investor Relations</span>
+                                        </a>
+                                        <a href="https://siddharsh.com/about-us/#career" class="mega-link-card">
+                                            <div class="mega-link-icon"><i class="fas fa-briefcase"></i></div>
+                                            <span class="mega-link-title">Careers</span>
                                         </a>
                                     </div>
                                 </div>
-                                <div class="about-dropdown-panel">
-                                    <div class="about-panel-copy">
-                                        <span class="about-panel-label">About Siddharsh</span>
-                                        <h4>Explore our story, values and team</h4>
-                                        <p>Discover why we are the trusted partner for solutions, alliances and long-term growth.</p>
-                                        <a href="https://siddharsh.com/about-us/" class="about-panel-cta">Visit About Us</a>
-                                    </div>
-                                    <div class="about-panel-image" aria-hidden="true">
-                                        <div class="illustration-card">
-                                            <div class="illustration-stack illustration-stack-1"></div>
-                                            <div class="illustration-stack illustration-stack-2"></div>
-                                            <div class="illustration-stack illustration-stack-3"></div>
-                                            <div class="illustration-wire"></div>
-                                            <div class="illustration-wire illustration-wire-2"></div>
+                                <div class="mega-panel-area">
+                                    <div class="mega-panel-inner">
+                                        <div class="mega-panel-img">
+                                            <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=800&q=80" alt="Corporate">
+                                            <div class="mega-panel-badge">ESTD 1999</div>
+                                        </div>
+                                        <div class="mega-panel-content">
+                                            <h4 class="mega-panel-title">Leading the Way in Enterprise Tech</h4>
+                                            <p class="mega-panel-desc">Siddharsh is a trusted distributor providing end-to-end infrastructure solutions.</p>
+                                            <a href="https://siddharsh.com/about-us/" class="mega-panel-btn">
+                                                Learn More <i class="fas fa-arrow-right"></i>
+                                            </a>
                                         </div>
                                     </div>
                                 </div>
@@ -136,7 +132,7 @@
 
                         <li class="nav-item has-mega">
                             <a href="{{ route('categories') }}" class="nav-link-item {{ request()->is('products*') ? 'active' : '' }}">
-                                <i class="fas fa-cubes nav-link-icon"></i> Products <i class="fas fa-chevron-down nav-arrow"></i>
+                                 Products <i class="fas fa-chevron-down nav-arrow"></i>
                             </a>
                             <div class="mega-menu" id="megaMenu">
                                 <div class="mega-inner">
@@ -188,53 +184,43 @@
 
                         <li class="nav-item has-mega">
                             <a href="{{ route('solutions.index') }}" class="nav-link-item {{ request()->is('solutions*') ? 'active' : '' }}">
-                                <i class="fas fa-lightbulb nav-link-icon"></i> Solutions <i class="fas fa-chevron-down nav-arrow"></i>
+                                 Solutions <i class="fas fa-chevron-down nav-arrow"></i>
                             </a>
                             <div class="mega-menu solutions-mega">
-                                <div class="mega-inner">
-                                    {{-- Left Panel: Illustration/Image --}}
-                                    <div class="solutions-mega-col solutions-mega-left d-none d-xl-flex">
-                                        <div class="solutions-left-inner">
-                                            <div class="solutions-featured-img mb-4">
-                                                <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=600&q=80" alt="Tech" class="rounded-3 shadow-sm">
-                                            </div>
-                                            <h5 class="fw-800 text-dark mb-2">Siddharsh Systems & Solutions</h5>
-                                            <p class="text-muted small mb-0">Private Limited.</p>
-                                        </div>
+                                <div class="mega-links-area">
+                                    <div class="mega-header">
+                                        <span class="mega-header-label">EXPERTISE</span>
+                                        <h3 class="mega-header-title">Our Solutions</h3>
                                     </div>
-
-                                    {{-- Middle Panel: Solutions List --}}
-                                    <div class="solutions-mega-col solutions-mega-mid">
-                                        <div class="solutions-mid-head">SOLUTIONS</div>
-                                        <div class="solutions-list-wrap p-2">
-                                            @forelse($headerSolutions as $sol)
-                                            <a href="{{ route('solutions.show', $sol->slug) }}" class="sol-item-link">
-                                                <div class="sol-icon-box-mini">
-                                                    @if($sol->icon)
-                                                        <img src="{{ asset('uploads/solutions/'.$sol->icon) }}" alt="{{ $sol->name }}">
-                                                    @else
-                                                        <i class="fas fa-cube"></i>
-                                                    @endif
-                                                </div>
-                                                <span class="sol-name-text">{{ $sol->name }}</span>
+                                    <div class="mega-grid-2-cols">
+                                        @forelse($headerSolutions as $sol)
+                                        <a href="{{ route('solutions.show', $sol->slug) }}" class="mega-link-card">
+                                            <div class="mega-link-icon">
+                                                @if(preg_match('/\.(png|jpg|jpeg|svg|webp)$/i', $sol->icon))
+                                                    <img src="{{ asset('uploads/solutions/'.$sol->icon) }}" alt="{{ $sol->name }}" style="width: 20px; height: 20px; filter: invert(1);">
+                                                @else
+                                                    <i class="{{ $sol->icon }}"></i>
+                                                @endif
+                                            </div>
+                                            <span class="mega-link-title">{{ $sol->name }}</span>
+                                        </a>
+                                        @empty
+                                        <div class="p-4 text-center text-muted small">No solutions found.</div>
+                                        @endforelse
+                                    </div>
+                                </div>
+                                <div class="mega-panel-area">
+                                    <div class="mega-panel-inner">
+                                        <div class="mega-panel-img">
+                                            <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=800&q=80" alt="Solutions">
+                                            <div class="mega-panel-badge">INNOVATION</div>
+                                        </div>
+                                        <div class="mega-panel-content">
+                                            <h4 class="mega-panel-title">Empowering Digital Transformation</h4>
+                                            <p class="mega-panel-desc">We design and distribute future-ready technology solutions.</p>
+                                            <a href="{{ route('solutions.index') }}" class="mega-panel-btn">
+                                                All Solutions <i class="fas fa-arrow-right"></i>
                                             </a>
-                                            @empty
-                                            <div class="p-4 text-center text-muted small">No solutions found.</div>
-                                            @endforelse
-                                        </div>
-                                    </div>
-
-                                    {{-- Right Panel: Video/Featured --}}
-                                    <div class="solutions-mega-col solutions-mega-right d-none d-lg-flex">
-                                        <div class="p-4 w-100">
-                                            <div class="video-card-premium rounded-4 overflow-hidden position-relative mb-0 shadow-sm">
-                                                <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80" alt="Networking" class="w-100 h-100 object-fit-cover">
-                                                <div class="video-card-overlay">
-                                                    <div class="play-trigger">
-                                                        <i class="fas fa-play"></i>
-                                                    </div>
-                                                </div>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -246,27 +232,40 @@
                                 Alliances <i class="fas fa-chevron-down nav-arrow"></i>
                             </a>
                             <div class="mega-menu alliances-mega">
-                                <div class="mega-inner p-4 p-lg-5">
-                                    <div class="w-100">
-                                        <div class="d-flex flex-column flex-lg-row align-items-start align-items-lg-center justify-content-between gap-3 mb-4">
-                                            <div>
-                                                <div class="mega-col-head mb-2 border-0 ps-0">OUR STRATEGIC ALLIANCES</div>
-                                                <p class="alliances-description">Explore our authorized partner brands and enterprise network solutions.</p>
-                                            </div>
-                                            <a href="{{ route('brands') }}" class="btn btn-outline-primary alliances-view-all">
-                                                View All Partner Brands <i class="fas fa-arrow-right ms-2"></i>
-                                            </a>
+                                <div class="mega-links-area">
+                                    <div class="mega-header">
+                                        <span class="mega-header-label">PARTNERSHIPS</span>
+                                        <h3 class="mega-header-title">Strategic Alliances</h3>
+                                    </div>
+                                    <div class="mega-grid-logo-layout">
+                                        @foreach($headerBrands->take(12) as $brand)
+                                        <a href="{{ route('brand.details', $brand->slug) }}" class="mega-logo-box" title="{{ $brand->name }}">
+                                            @if($brand->image)
+                                                <img src="{{ asset('uploads/brands/'.$brand->image) }}" alt="{{ $brand->name }}">
+                                            @else
+                                                <span class="mega-logo-text">{{ $brand->name }}</span>
+                                            @endif
+                                        </a>
+                                        @endforeach
+                                    </div>
+                                    <div class="mega-links-footer mt-4">
+                                        <a href="{{ route('brands') }}" class="mega-action-link">
+                                            Discover All 50+ Global Partners <i class="fas fa-long-arrow-alt-right"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="mega-panel-area">
+                                    <div class="mega-panel-inner">
+                                        <div class="mega-panel-img">
+                                            <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=800&q=80" alt="Alliances">
+                                            <div class="mega-panel-badge">PARTNERS</div>
                                         </div>
-                                        <div class="alliances-grid">
-                                            @foreach($headerBrands->take(10) as $brand)
-                                            <a href="{{ route('brand.details', $brand->slug) }}" class="mega-brand-box" title="{{ $brand->name }}">
-                                                @if($brand->image)
-                                                    <img src="{{ asset('uploads/brands/'.$brand->image) }}" alt="{{ $brand->name }}">
-                                                @else
-                                                    <span class="mega-brand-text">{{ $brand->name }}</span>
-                                                @endif
+                                        <div class="mega-panel-content">
+                                            <h4 class="mega-panel-title">The World's Leading Brands</h4>
+                                            <p class="mega-panel-desc">We collaborate with global technology leaders to deliver best-in-class products to our clients.</p>
+                                            <a href="{{ route('brands') }}" class="mega-panel-btn">
+                                                Partner Brands <i class="fas fa-arrow-right"></i>
                                             </a>
-                                            @endforeach
                                         </div>
                                     </div>
                                 </div>
@@ -275,7 +274,7 @@
 
                         <li class="nav-item has-dropdown">
                             <a href="https://siddharsh.com/services/" class="nav-link-item">
-                                <i class="fas fa-wrench nav-link-icon"></i> Services <i class="fas fa-chevron-down nav-arrow"></i>
+                                 Services <i class="fas fa-chevron-down nav-arrow"></i>
                             </a>
                             <div class="nav-dropdown services-dropdown">
                                 <div class="services-dropdown-links">
@@ -296,14 +295,12 @@
                         </li>
 
                     </ul>
-
-                    {{-- Right Actions --}}
-                    <div class="nav-actions ms-4">
-                        <a href="{{ route('search') }}" class="btn btn-quote-premium">
-                            Get a quote now <i class="fas fa-arrow-right ms-2"></i>
-                        </a>
-                    </div>
                 </div>
+
+                {{-- Get a Quote Button --}}
+                <a href="{{ route('search') }}" class="btn btn-quote-premium">
+                    Get a quote now <i class="fas fa-arrow-right ms-2"></i>
+                </a>
 
                 {{-- Mobile Toggle --}}
                 <button class="hamburger d-lg-none" id="mobileToggle" aria-label="Open menu" aria-expanded="false">
@@ -342,6 +339,10 @@
                         <a href="https://siddharsh.com/about-us/#our-team" class="mobile-sub-link">Our Team</a>
                         <a href="https://siddharsh.com/about-us/#siddharsh-advantage" class="mobile-sub-link">Siddharsh Advantage</a>
                         <a href="https://siddharsh.com/about-us/#career" class="mobile-sub-link">Career</a>
+                        <div class="mobile-about-summary">
+                            <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=500&q=80" alt="About Us" loading="lazy">
+                            <p>We deliver reliable enterprise IT infrastructure solutions with a people-first, partnership-driven approach.</p>
+                        </div>
                     </div>
                 </li>
 
@@ -504,47 +505,41 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 70px;
+    gap: 1rem;
+    min-height: 70px;
+    padding: 0.55rem 0;
 }
 
 /* Logo */
 .nav-logo { display: flex; align-items: center; flex-shrink: 0; }
 .logo-text {
     font-family: 'Outfit', sans-serif;
-    font-size: 1.6rem;
+    font-size: 1.5rem;
     font-weight: 900;
     color: var(--dark);
     letter-spacing: -0.03em;
 }
 .logo-dot { color: var(--primary); }
 
-/* Desktop Menu */
-.nav-menu-wrapper { display: flex; align-items: center; flex: 1; justify-content: flex-end; }
-.nav-menu {
-    list-style: none;
-    display: flex;
-    align-items: center;
-    gap: 2px;
-    margin: 0; padding: 0;
-}
-.nav-item { position: relative; }
-
+/* Search Bar */
 .header-search-form {
     display: flex;
     align-items: center;
     background: #f3f4f6;
     border: 1.5px solid #e5e7eb;
     border-radius: 999px;
-    padding: 2px 6px 2px 18px;
-    width: 320px;
+    padding: 2px 6px 2px -5px;
+    width: 200px;
+    max-width: 100%;
     transition: all 0.25s ease;
+    flex-shrink: 0;
 }
 .header-search-input {
     border: none;
     background: transparent;
     width: 100%;
     padding: 10px 12px;
-    font-size: 0.92rem;
+    font-size: 0.9rem;
     color: #1f2937;
     outline: none;
     border-radius: 999px;
@@ -557,8 +552,8 @@
     background: transparent;
     color: #007e5e;
     font-size: 1rem;
-    width: 42px;
-    height: 42px;
+    width: 40px;
+    height: 40px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -571,16 +566,27 @@
 }
 .header-search-form:focus-within {
     border-color: #007e5e;
-    box-shadow: 0 0 0 3px rgba(0,126,94,0.12);
+    box-shadow: 0 0 0 2px rgba(0,126,94,0.12);
 }
+
+/* Desktop Menu */
+.nav-menu-wrapper { display: flex; align-items: center; flex: 1; justify-content: center; }
+.nav-menu {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 0rem;
+    margin: 0; padding: 0;
+}
+.nav-item { position: relative; }
 
 .nav-link-item {
     font-family: 'Outfit', sans-serif;
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 18px 12px;
-    font-size: 0.92rem;
+    gap: 8px;
+    padding: 14px 16px;
+    font-size: 0.9rem;
     font-weight: 700;
     color: #222 !important;
     letter-spacing: 0.01em;
@@ -591,10 +597,10 @@
 .nav-link-item::after {
     content: '';
     position: absolute;
-    bottom: 12px;
-    left: 12px;
-    right: 12px;
-    height: 3px;
+    bottom: 10px;
+    left: 16px;
+    right: 16px;
+    height: 2px;
     background: #007e5e;
     transform: scaleX(0);
     transition: transform 0.3s ease;
@@ -609,10 +615,16 @@
     color: #007e5e !important;
 }
 .nav-arrow {
-    font-size: 0.6rem;
+    font-size: 0.65rem;
     transition: transform 0.25s ease;
 }
 .nav-item:hover .nav-arrow { transform: rotate(180deg); }
+
+.nav-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
 /* Dropdown Menu */
 .nav-dropdown {
@@ -655,131 +667,254 @@
     visibility: visible;
     transform: translateY(0);
 }
-.nav-dropdown.about-dropdown {
+.mega-menu.about-mega,
+.mega-menu.solutions-mega,
+.mega-menu.alliances-mega {
     display: grid;
-    grid-template-columns: 1.45fr 1fr;
-    gap: 28px;
-    width: 1100px;
-    max-width: calc(100vw - 80px);
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 26px;
-}
-.nav-item.has-dropdown:hover > .nav-dropdown.about-dropdown,
-.nav-item.has-dropdown.is-open > .nav-dropdown.about-dropdown {
-    transform: translateX(-50%) translateY(0);
-}
-.about-dropdown-links {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 20px;
-}
-.dropdown-col {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-.nav-dropdown-link {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 16px 18px;
-    font-size: 0.95rem;
-    font-weight: 700;
-    color: #1f2937;
-    border-radius: 16px;
-    text-decoration: none;
-    transition: all 0.25s ease;
-    border: 1px solid rgba(0,0,0,0.06);
+    grid-template-columns: 1.8fr 1fr;
+    padding: 0;
+    overflow: hidden;
     background: #fff;
-    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04);
 }
-.nav-dropdown-link:hover {
-    background: #f0f7f4;
+
+.mega-links-area {
+    padding: 24px 32px;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+}
+
+.mega-header {
+    margin-bottom: 16px;
+}
+
+.mega-header-label {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 800;
     color: #007e5e;
-    border-color: rgba(0, 126, 94, 0.12);
-    transform: translateX(4px);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
 }
-.nav-dropdown-icon {
+
+.mega-header-title {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: #1a1a1a;
+    margin: 0;
+}
+
+.mega-grid-2-cols {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+.mega-link-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: #fdfdfd;
+    border: 1px solid rgba(0,0,0,0.04);
+    text-decoration: none !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mega-link-card:hover {
+    background: #f0f7f4;
+    border-color: rgba(0, 126, 94, 0.15);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0, 126, 94, 0.05);
+}
+
+.mega-link-icon {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 48px;
-    height: 48px;
-    background: linear-gradient(135deg, #007e5e 0%, #009d7a 100%);
-    border-radius: 14px;
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, #007e5e 0%, #00a87d 100%);
+    border-radius: 10px;
     color: #fff;
-    font-size: 1.1rem;
+    font-size: 0.95rem;
     flex-shrink: 0;
-    transition: all 0.3s ease;
-    box-shadow: 0 6px 18px rgba(0, 126, 94, 0.18);
+    box-shadow: 0 4px 10px rgba(0, 126, 94, 0.1);
 }
-.nav-dropdown-link:hover .nav-dropdown-icon {
-    background: linear-gradient(135deg, #005a46 0%, #007e5e 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 22px rgba(0, 126, 94, 0.24);
-}
-.nav-dropdown-link span:last-child {
-    flex: 1;
-}
-.about-dropdown-panel {
+
+.mega-link-text {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    gap: 24px;
-    min-height: 100%;
-    padding: 24px;
-    background: linear-gradient(180deg, rgba(0,126,94,0.08) 0%, rgba(255,255,255,0.9) 100%);
-    border-radius: 24px;
-    border: 1px solid rgba(0, 126, 94, 0.12);
-    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.6);
+    gap: 2px;
 }
-.about-panel-copy {
-    max-width: 100%;
+
+.mega-link-title {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    transition: color 0.3s ease;
 }
-.about-panel-label {
-    display: inline-block;
-    font-size: 0.8rem;
-    font-weight: 800;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: #007e5e;
-    margin-bottom: 12px;
-}
-.about-dropdown-panel h4 {
-    margin: 0 0 12px;
-    line-height: 1.2;
-    font-size: 1.35rem;
-    color: #0f172a;
-}
-.about-dropdown-panel p {
+
+.mega-link-desc {
+    font-size: 0.78rem;
+    color: #666;
     margin: 0;
-    color: #475569;
-    line-height: 1.7;
-    font-size: 0.95rem;
+    line-height: 1.4;
 }
-.about-panel-cta {
+
+.mega-link-card:hover .mega-link-title {
+    color: #007e5e;
+}
+
+.mega-panel-area {
+    background: #f8fafc;
+    border-left: 1px solid rgba(0,0,0,0.05);
+    padding: 32px;
+    display: flex;
+}
+
+.mega-panel-inner {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.mega-panel-img {
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    aspect-ratio: 16/9;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+}
+
+.mega-panel-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+}
+
+.mega-panel-inner:hover .mega-panel-img img {
+    transform: scale(1.05);
+}
+
+.mega-panel-badge {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    background: rgba(0, 126, 94, 0.95);
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: 800;
+    padding: 4px 10px;
+    border-radius: 6px;
+    letter-spacing: 0.05em;
+    backdrop-filter: blur(4px);
+}
+
+.mega-panel-content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.mega-panel-title {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #1a1a1a;
+    margin: 0;
+    line-height: 1.3;
+}
+
+.mega-panel-desc {
+    font-size: 0.85rem;
+    color: #555;
+    margin: 0;
+    line-height: 1.6;
+}
+
+.mega-panel-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: #007e5e !important;
+    font-weight: 700;
+    font-size: 0.88rem;
+    text-decoration: none !important;
+    transition: gap 0.3s ease;
+    margin-top: 4px;
+}
+
+.mega-panel-btn:hover {
+    gap: 14px;
+}
+
+.mega-grid-logo-layout {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+}
+
+.mega-logo-box {
+    background: #fff;
+    border: 1px solid rgba(0,0,0,0.06);
+    border-radius: 14px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.mega-logo-box img {
+    max-height: 36px;
+    max-width: 100%;
+    object-fit: contain;
+    filter: grayscale(1);
+    opacity: 0.6;
+    transition: all 0.3s ease;
+}
+
+.mega-logo-box:hover {
+    border-color: #007e5e;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0, 126, 94, 0.08);
+}
+
+.mega-logo-box:hover img {
+    filter: grayscale(0);
+    opacity: 1;
+}
+
+.mega-action-link {
     display: inline-flex;
     align-items: center;
     gap: 8px;
+    color: #007e5e;
     font-weight: 700;
-    color: #fff;
-    background: #007e5e;
-    padding: 12px 18px;
-    border-radius: 999px;
-    text-decoration: none;
-    transition: transform 0.25s ease, background 0.25s ease;
+    font-size: 0.9rem;
+    text-decoration: none !important;
+}
+
+.mega-action-link:hover i {
+    transform: translateX(5px);
+}
+.mega-action-link i {
+    transition: transform 0.3s ease;
 }
 .about-panel-cta:hover {
     background: #005a47;
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0, 126, 94, 0.2);
 }
+/* Removed old about panel styles */
 .about-panel-image {
-    position: relative;
-    min-height: 210px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: none;
 }
 .illustration-card {
     position: relative;
@@ -829,13 +964,15 @@
     font-family: 'Outfit', sans-serif;
     background: #004d39;
     color: #fff !important;
-    padding: 12px 24px;
+    padding: 10px 22px;
     font-size: 0.9rem;
     font-weight: 700;
-    border-radius: 6px;
+    border-radius: 10px;
     transition: all 0.3s ease;
-    display: flex;
+    display: inline-flex;
     align-items: center;
+    justify-content: center;
+    min-height: 44px;
     border: none;
     text-decoration: none;
 }
@@ -846,6 +983,14 @@
 }
 
 /* ─── MEGA MENU ─────────────────────────────────────────── */
+.nav-item.has-dropdown,
+.nav-item.has-mega {
+    position: relative;
+}
+
+.nav-item.has-mega {
+    position: static !important;
+}
 .has-mega { position: static !important; }
 
 .mega-menu {
@@ -854,13 +999,14 @@
     width: auto;
     min-width: 350px;
     max-width: 95vw;
-    left: 0; 
+    left: 50% !important;
+    transform: translate(-50%, 20px) !important;
     background: #fff;
     box-shadow: 0 20px 60px rgba(0,0,0,0.12);
     opacity: 0;
     visibility: hidden;
     transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-    z-index: 1000;
+    z-index: 1050;
     border: 1px solid var(--border-light);
     border-top: 4px solid #007e5e;
     pointer-events: none;
@@ -870,27 +1016,32 @@
 .has-mega.is-open .mega-menu { 
     opacity: 1; 
     visibility: visible; 
-    transform: translateY(0); 
+    transform: translate(-50%, 0) !important;
     pointer-events: auto;
+}
+
+/* Fixed size only for these three */
+.about-mega,
+.solutions-mega,
+.alliances-mega {
+    width: 1100px !important;
+    height: 380px !important;
+    border-radius: 24px !important;
+    border: none !important;
+    box-shadow: 0 40px 100px rgba(0,0,0,0.18) !important;
+    border-top: 4px solid #007e5e !important;
 }
 
 .mega-inner {
     display: flex;
+    align-items: stretch;
     background: #fff;
     height: auto;
-    max-height: 500px;
+    max-height: 420px;
     overflow: hidden;
 }
 
-/* About Mega specific */
-.about-mega {
-    width: 1100px;
-    left: 50% !important;
-    transform: translate(-50%, 20px) !important;
-}
-.has-mega.is-open .about-mega {
-    transform: translate(-50%, 0) !important;
-}
+/* About Mega styles moved up and standardized */
 
 .mega-feature-list { list-style: none; padding: 0; margin: 0; }
 .mega-feature-item { margin-bottom: 5px; }
@@ -910,14 +1061,14 @@
 .mega-cat-footer {
     border-top: 1px solid #eee;
     margin-top: auto;
-    padding: 18px 20px 20px;
+    padding: 14px 16px 16px;
 }
 .mega-featured-trigger {
     display: flex;
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    padding: 14px 20px;
+    padding: 12px 16px;
     border-radius: 12px;
     background: #f9fafb;
     color: #222;
@@ -963,7 +1114,9 @@
 .mega-col { 
     width: 350px;
     flex-shrink: 0;
-    height: 500px;
+    height: auto;
+    min-height: 320px;
+    max-height: 420px;
     overflow-y: auto;
     overflow-x: hidden;
     opacity: 0;
@@ -988,7 +1141,7 @@
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: #007e5e; 
-    padding: 18px 20px 10px;
+    padding: 14px 16px 8px;
     border-bottom: 1px solid #eee;
     margin-bottom: 5px;
     position: sticky;
@@ -1001,7 +1154,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 20px;
+    padding: 10px 16px;
     font-size: 0.85rem;
     font-weight: 600;
     color: #444;
@@ -1020,7 +1173,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 20px;
+    padding: 8px 16px;
     font-size: 0.82rem;
     font-weight: 600;
     color: #333;
@@ -1033,7 +1186,7 @@
 
 .mega-child-link {
     display: block;
-    padding: 8px 20px;
+    padding: 6px 16px;
     font-size: 0.8rem;
     font-weight: 600;
     color: #555;
@@ -1141,38 +1294,56 @@
     box-shadow: 0 4px 15px rgba(0,126,94,0.2);
 }
 
+.mobile-about-summary {
+    background: #f3faf6;
+    border-radius: 16px;
+    padding: 16px;
+    margin-top: 10px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+.mobile-about-summary img {
+    width: 54px;
+    height: 54px;
+    object-fit: cover;
+    border-radius: 14px;
+    flex-shrink: 0;
+}
+.mobile-about-summary p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #2f3b45;
+    line-height: 1.4;
+}
+
 /* ─── ALLIANCES MEGA ────────────────────────────────────── */
 .alliances-mega {
-    width: 1200px;
-    max-width: calc(100vw - 40px);
-    left: 50% !important;
-    transform: translate(-50%, 20px) !important;
-    border-radius: 24px !important;
-    border: none !important;
-    box-shadow: 0 30px 100px rgba(0,0,0,0.15) !important;
-}
-.has-mega.is-open .alliances-mega {
-    transform: translate(-50%, 0) !important;
+    /* Styles inherited from .mega-menu */
 }
 .alliances-grid {
     display: grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 18px;
+    gap: 20px;
+    max-height: 320px;
+    overflow-y: auto;
+    padding: 10px;
+    margin: 0;
 }
 .mega-brand-box {
     background: #fff;
     border: 1px solid rgba(0,0,0,0.08);
     border-radius: 18px;
-    min-height: 130px;
+    min-height: 110px;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 18px;
+    padding: 14px;
     transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
     text-decoration: none;
 }
 .mega-brand-box img {
-    max-height: 60px;
+    max-height: 50px;
     max-width: 100%;
     object-fit: contain;
     filter: grayscale(1);
@@ -1197,14 +1368,14 @@
 .alliances-description {
     margin: 0;
     color: #475569;
-    font-size: 0.95rem;
+    font-size: 0.92rem;
     max-width: 560px;
 }
 .alliances-view-all {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 12px 20px;
+    padding: 10px 16px;
     border-radius: 999px;
     border: 1px solid #007e5e;
     color: #007e5e;
@@ -1216,8 +1387,44 @@
     color: #fff;
     transform: translateY(-1px);
 }
+@media (max-width: 1200px) {
+    .header-search-form { width: 230px; }
+    .nav-link-item { padding: 12px 14px; font-size: 0.88rem; }
+    .btn-quote-premium { padding: 10px 18px; font-size: 0.88rem; }
+    .nav-menu { gap: 0.35rem; }
+}
+
 @media (max-width: 992px) {
-    .alliances-mega { width: calc(100vw - 40px); }
+    .nav-inner {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.75rem;
+    }
+    .header-search-form { width: 250px; order: 1; }
+    .nav-menu-wrapper { order: 2; width: 100%; justify-content: center; }
+    .btn-quote-premium { order: 3; }
+    .hamburger { order: 4; }
+}
+
+@media (max-width: 768px) {
+    .topbar-left, .topbar-right { justify-content: center; text-align: center; }
+    .topbar-marquee-wrap { order: 3; width: 100%; padding: 10px 0; }
+    .nav-inner { padding: 0.7rem 0; gap: 0.5rem; }
+    .nav-menu-wrapper { display: none; }
+    .header-search-form { width: 200px; }
+    .btn-quote-premium { padding: 8px 16px; font-size: 0.85rem; }
+    .hamburger { display: flex; }
+}
+
+@media (max-width: 576px) {
+    .nav-inner { justify-content: space-between; flex-wrap: nowrap; }
+    .header-search-form { display: none; }
+    .btn-quote-premium { display: none; }
+    .hamburger { display: flex; }
+}
+
+@media (max-width: 992px) {
+    .about-dropdown-panel { min-height: auto; }
 }
 
 /* ─── NAV LINK ICONS ──────────────────────────────────── */
@@ -1295,99 +1502,89 @@
 }
 
 /* ─── SOLUTIONS MEGA ENHANCED ────────────────────────────── */
-.solutions-mega {
-    width: 1000px;
-    left: 50% !important;
-    top: 72% !important;
-    transform: translate(-50%, 20px) !important;
-    border-radius: 20px !important;
-    border: none !important;
-    box-shadow: 0 40px 100px rgba(0,0,0,0.18) !important;
-    border-top: 4px solid #007e5e !important;
-}
-
-.solutions-mega-col {
-    display: flex !important;
-    flex-direction: column;
-    height: 420px;
-    border-right: 1px solid #f1f5f9;
-    opacity: 1 !important;
-    visibility: visible !important;
-}
-.solutions-mega-left {
-    width: 320px;
-    padding: 30px;
-    background: #fff;
-    display: flex !important;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+/* Solutions mega specific overrides if needed */
+.solutions-mega .mega-grid-2-cols {
+    margin-top: 10px;
 }
 .solutions-left-inner { text-align: center; width: 100%; }
-.solutions-featured-img { width: 100%; height: 160px; margin-bottom: 20px; overflow: hidden; border-radius: 12px; }
+.solutions-featured-img { width: 100%; height: 130px; margin-bottom: 15px; overflow: hidden; border-radius: 12px; }
 .solutions-featured-img img { width: 100%; height: 100%; object-fit: cover; }
 
 .solutions-mega-mid {
     flex-grow: 1;
     background: #fff;
-    padding: 30px 0;
     display: flex !important;
+    flex-direction: column;
+    padding: 35px 30px;
 }
 .solutions-mid-head {
-    font-size: 0.8rem;
+    font-size: 0.82rem;
     font-weight: 800;
     color: #007e5e;
     letter-spacing: 0.05em;
-    padding: 0 30px 15px;
+    padding-bottom: 12px;
     border-bottom: 1px solid #f1f5f9;
-    margin-bottom: 15px;
+    margin-bottom: 16px;
+}
+.solutions-list-wrap {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    padding: 0;
+    margin-top: auto;
+    margin-bottom: auto;
+}
+.sol-name-text {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #1e293b;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 .sol-item-link {
     display: flex;
     align-items: center;
-    gap: 18px;
-    padding: 12px 30px;
+    gap: 14px;
+    padding: 14px 18px;
     text-decoration: none !important;
     transition: all 0.25s ease;
+    border-radius: 16px;
+    border: 1px solid rgba(0,0,0,0.06);
+    background: #fff;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.04);
 }
 .sol-item-link:hover {
-    background: #f8fafc;
+    background: #f0f7f4;
+    border-color: rgba(0, 126, 94, 0.2);
+    transform: translateY(-2px);
 }
 .sol-icon-box-mini {
-    width: 40px;
-    height: 40px;
-    background: #004d39;
+    width: 34px;
+    height: 34px;
+    background: linear-gradient(135deg, #007e5e, #005a47);
     color: #fff;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 8px;
-    font-size: 1.1rem;
+    font-size: 0.9rem;
     flex-shrink: 0;
-}
-.sol-icon-box-mini img {
-    width: 22px;
-    height: 22px;
-    object-fit: contain;
-    filter: brightness(0) invert(1);
-}
-.sol-name-text {
-    font-size: 1rem;
-    font-weight: 700;
-    color: #1e293b;
+    box-shadow: 0 4px 10px rgba(0, 126, 94, 0.15);
 }
 
 .solutions-mega-right {
-    width: 320px;
+    width: 240px;
     background: #fff;
     border-right: none;
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 20px;
 }
 .video-card-premium {
     width: 100%;
-    height: 220px;
+    height: 160px;
     cursor: pointer;
 }
 .video-card-overlay {

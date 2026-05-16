@@ -13,6 +13,7 @@ class Setting extends Model
         'site_title',
         'site_description',
         'logo',
+        'footer_logo',
         'favicon',
         'email',
         'phone',

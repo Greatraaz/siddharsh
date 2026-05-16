@@ -12,8 +12,10 @@
                 <div class="col-lg-3 col-md-6">
                     <div class="footer-brand-col">
                         <div class="footer-logo mb-4">
-                            @if($footerSettings && $footerSettings->logo)
-                                <img src="{{ asset('uploads/settings/'.$footerSettings->logo) }}" alt="Logo" style="height:54px;filter:brightness(0) invert(1);">
+                            @if($footerSettings && $footerSettings->footer_logo)
+                                <img src="{{ asset('uploads/settings/'.$footerSettings->footer_logo) }}" alt="Logo" style="height:54px; width:auto; object-fit:contain;">
+                            @elseif($footerSettings && $footerSettings->logo)
+                                <img src="{{ asset('uploads/settings/'.$footerSettings->logo) }}" alt="Logo" style="height:54px; width:auto; object-fit:contain; filter:brightness(0) invert(1);">
                             @else
                                 <span class="footer-logo-text">SIDDHARSH<span>.</span></span>
                             @endif
@@ -39,8 +41,9 @@
                 <div class="col-lg-3 col-md-6">
                     <h6 class="footer-col-title text-light">Newsletter</h6>
                     <p class="footer-sub-desc">Subscribe our newsletter to get our latest update & news.</p>
-                    <form class="footer-nl-box mb-4">
-                        <input type="email" placeholder="Your mail address" class="nl-input">
+                    <form class="footer-nl-box mb-4" id="newsletterForm">
+                        @csrf
+                        <input type="email" name="email" placeholder="Your mail address" class="nl-input" required>
                         <button type="submit" class="nl-btn"><i class="fas fa-paper-plane"></i></button>
                     </form>
 
@@ -83,18 +86,17 @@
                 <div class="col-lg-3 col-md-6">
                     <h6 class="footer-col-title text-light">Menu</h6> 
                     <ul class="footer-menu-list mb-4">
-                        <li><a href="{{ route('home') }}"><i class="fas fa-link"></i> Home</a></li>
-                        <li><a href="https://siddharsh.com/about-us/"><i class="fas fa-link"></i> About us</a></li>
-                        <li><a href="https://siddharsh.com/services/"><i class="fas fa-link"></i> Services</a></li>
-                        <li><a href="https://siddharsh.com/blog/"><i class="fas fa-link"></i> Blog</a></li>
-                        <li><a href="{{ route('contact') }}"><i class="fas fa-link"></i> Contact us</a></li>
+                        <li><a href="{{ route('home') }}"><i class="fas fa-home"></i> Home</a></li>
+                        <li><a href="https://siddharsh.com/about-us/"><i class="fas fa-info-circle"></i> About us</a></li>
+                        <li><a href="https://siddharsh.com/services/"><i class="fas fa-tools"></i> Services</a></li>
+                        <li><a href="https://siddharsh.com/blog/"><i class="fas fa-blog"></i> Blog</a></li>
+                        <li><a href="{{ route('contact') }}"><i class="fas fa-envelope"></i> Contact us</a></li>
                     </ul>
                     
                     <div class="footer-badge">
                         {{-- Bicsi Logo placeholder --}}
                         <div class="bicsi-logo">
-                            <span class="bicsi-text">Bicsi</span>
-                            <span class="bicsi-sub">CORPORATE MEMBER</span>
+                           <img src="{{ asset('corporate-Member.png') }}" alt="Logo" style="height:54px;filter:brightness(0) invert(1);">
                         </div>
                         <p class="bicsi-member-text">BICSI India Corporate Member – 2025</p>
                     </div>
@@ -248,3 +250,49 @@
     color: rgba(255,255,255,0.5);
 }
 </style>
+@push('scripts')
+<script>
+$(document).ready(function() {
+    $('#newsletterForm').on('submit', function(e) {
+        e.preventDefault();
+        
+        let form = $(this);
+        let btn = form.find('button');
+        let originalHtml = btn.html();
+        
+        btn.html('<i class="fas fa-spinner fa-spin"></i>').prop('disabled', true);
+        
+        $.ajax({
+            url: "{{ route('newsletter.submit') }}",
+            method: "POST",
+            data: form.serialize(),
+            success: function(response) {
+                Swal.fire({
+                    icon: response.status,
+                    title: response.status.toUpperCase(),
+                    text: response.message,
+                    confirmButtonColor: '#038a6b'
+                });
+                if(response.status === 'success') {
+                    form.trigger('reset');
+                }
+            },
+            error: function(xhr) {
+                let msg = 'Something went wrong. Please try again.';
+                if(xhr.responseJSON && xhr.responseJSON.message) {
+                    msg = xhr.responseJSON.message;
+                }
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: msg
+                });
+            },
+            complete: function() {
+                btn.html(originalHtml).prop('disabled', false);
+            }
+        });
+    });
+});
+</script>
+@endpush

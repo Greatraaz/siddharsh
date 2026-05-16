@@ -49,6 +49,10 @@
                 <span class="badge bg-danger rounded-pill ms-auto">{{ $unreadCount }}</span>
             @endif
         </a>
+        <a href="{{ route('admin.newsletters.index') }}" class="nav-link {{ request()->routeIs('admin.newsletters.*') ? 'active' : '' }}">
+            <i class="fa-solid fa-paper-plane"></i>
+            <span>Newsletter</span>
+        </a>
 
         <div class="px-4 pt-3 pb-2">
             <small class="text-uppercase text-muted fw-bold" style="font-size: 10px; letter-spacing: 1px;">Settings</small>

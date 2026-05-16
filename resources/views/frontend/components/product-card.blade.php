@@ -10,7 +10,7 @@
 <div class="product-modern-card reveal h-100 shadow-sm">
     <div class="product-card-upper">
         @if($thumb)
-            <img src="{{ $thumb }}" alt="{{ $product->name }}" class="product-card-img-main" loading="lazy">
+            <img src="{{ $thumb }}" alt="{{ $product->name }}" class="product-card-img-main" loading="lazy" decoding="async">
         @else
             <div class="product-card-placeholder">
                 <i class="fas fa-box-open"></i>

@@ -55,15 +55,24 @@
                                 <textarea name="site_description" class="form-control @error('site_description') is-invalid @enderror" rows="3">{{ old('site_description', $setting->site_description) }}</textarea>
                                 @error('site_description') <small class="text-danger mt-1 d-block">{{ $message }}</small> @enderror
                             </div>
-                            <div class="col-md-6 mb-4">
-                                <label class="form-label fw-bold">Logo</label>
-                                @if($setting->logo)
-                                    <div class="mb-3">
-                                        <img src="{{ asset('uploads/settings/'.$setting->logo) }}" alt="Logo" class="rounded shadow-sm" style="max-height: 80px; max-width: 100%; background: #f8fafc; padding: 10px; border: 1px solid #e2e8f0;">
-                                    </div>
-                                @endif
-                                <input type="file" name="logo" class="form-control @error('logo') is-invalid @enderror" accept="image/*">
-                            </div>
+                             <div class="col-md-6 mb-4">
+                                 <label class="form-label fw-bold">Header Logo</label>
+                                 @if($setting->logo)
+                                     <div class="mb-3">
+                                         <img src="{{ asset('uploads/settings/'.$setting->logo) }}" alt="Logo" class="rounded shadow-sm" style="max-height: 80px; max-width: 100%; background: #f8fafc; padding: 10px; border: 1px solid #e2e8f0;">
+                                     </div>
+                                 @endif
+                                 <input type="file" name="logo" class="form-control @error('logo') is-invalid @enderror" accept="image/*">
+                             </div>
+                             <div class="col-md-6 mb-4">
+                                 <label class="form-label fw-bold">Footer Logo</label>
+                                 @if($setting->footer_logo)
+                                     <div class="mb-3">
+                                         <img src="{{ asset('uploads/settings/'.$setting->footer_logo) }}" alt="Footer Logo" class="rounded shadow-sm" style="max-height: 80px; max-width: 100%; background: #000; padding: 10px; border: 1px solid #e2e8f0;">
+                                     </div>
+                                 @endif
+                                 <input type="file" name="footer_logo" class="form-control @error('footer_logo') is-invalid @enderror" accept="image/*">
+                             </div>
                             <div class="col-md-6 mb-4">
                                 <label class="form-label fw-bold">Favicon</label>
                                 @if($setting->favicon)

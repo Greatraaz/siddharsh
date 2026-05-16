@@ -26,6 +26,7 @@ class SettingController extends Controller
             'site_title' => 'nullable|string|max:255',
             'site_description' => 'nullable|string',
             'logo' => 'nullable|image|mimes:jpg,jpeg,png,webp,svg|max:2048',
+            'footer_logo' => 'nullable|image|mimes:jpg,jpeg,png,webp,svg|max:2048',
             'favicon' => 'nullable|image|mimes:jpg,jpeg,png,ico,webp|max:1024',
             'email' => 'nullable|email|max:255',
             'phone' => 'nullable|string|max:20',
@@ -39,6 +40,7 @@ class SettingController extends Controller
         ]);
 
         $logoName = $setting->logo;
+        $footerLogoName = $setting->footer_logo;
         $faviconName = $setting->favicon;
 
         // Handle Logo
@@ -49,6 +51,16 @@ class SettingController extends Controller
             $logo = $request->file('logo');
             $logoName = time() . '_logo.' . $logo->getClientOriginalExtension();
             $logo->move(public_path('uploads/settings'), $logoName);
+        }
+        
+        // Handle Footer Logo
+        if ($request->hasFile('footer_logo')) {
+            if ($setting->footer_logo && file_exists(public_path('uploads/settings/'.$setting->footer_logo))) {
+                unlink(public_path('uploads/settings/'.$setting->footer_logo));
+            }
+            $footerLogo = $request->file('footer_logo');
+            $footerLogoName = time() . '_footer_logo.' . $footerLogo->getClientOriginalExtension();
+            $footerLogo->move(public_path('uploads/settings'), $footerLogoName);
         }
 
         // Handle Favicon
@@ -65,6 +77,7 @@ class SettingController extends Controller
             'site_title' => $request->site_title,
             'site_description' => $request->site_description,
             'logo' => $logoName,
+            'footer_logo' => $footerLogoName,
             'favicon' => $faviconName,
             'email' => $request->email,
             'phone' => $request->phone,
