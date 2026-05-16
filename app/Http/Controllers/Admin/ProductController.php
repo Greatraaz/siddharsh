@@ -414,6 +414,18 @@ class ProductController extends Controller
         ]);
     }
 
+    public function importLogs()
+    {
+        $logs = ProductImportLog::latest()->paginate(15);
+        return view('admin.products.import_logs', compact('logs'));
+    }
+
+    public function importLogShow($id)
+    {
+        $log = ProductImportLog::findOrFail($id);
+        return view('admin.products.import_log_show', compact('log'));
+    }
+
     public function downloadTemplate()
     {
         $spreadsheet = new Spreadsheet;

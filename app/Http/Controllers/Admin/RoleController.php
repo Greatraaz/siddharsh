@@ -61,9 +61,7 @@ class RoleController extends Controller
     {
         $role = Role::findOrFail($id);
         $permissions = Permission::all();
-        $rolePermissions = DB::table('role_has_permissions')->where('role_id', $id)
-            ->pluck('permission_id', 'permission_id')
-            ->all();
+        $rolePermissions = $role->permissions->pluck('name')->toArray();
 
         return view('admin.roles.edit', compact('role', 'permissions', 'rolePermissions'));
     }
@@ -81,7 +79,6 @@ class RoleController extends Controller
         $role = Role::findOrFail($id);
         $role->name = $request->name;
         $role->save();
-
         $role->syncPermissions($request->permissions);
 
         return redirect()->route('admin.roles.index')

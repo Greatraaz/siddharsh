@@ -10,6 +10,9 @@
             <p class="text-muted mb-0">Upload a spreadsheet (.xlsx) and a ZIP archive of product images. Processing runs in the background.</p>
         </div>
         <div class="d-flex flex-wrap gap-2">
+            <a href="{{ route('admin.products.import-logs') }}" class="btn btn-outline-info rounded-pill px-4">
+                <i class="fa-solid fa-clock-rotate-left me-1"></i> View Import History
+            </a>
             <a href="{{ route('admin.products.import.template') }}" class="btn btn-outline-primary rounded-pill px-4">
                 <i class="fa-solid fa-download me-1"></i> Download template
             </a>

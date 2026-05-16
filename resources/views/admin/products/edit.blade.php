@@ -1,5 +1,7 @@
 @extends('admin.layouts.app')
 
+@section('title', 'Edit Product')
+
 @push('css')
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
@@ -11,248 +13,229 @@
         border-radius: 4px;
         padding: 2px 8px;
     }
-    .select2-container--bootstrap-5 .select2-selection--multiple .select2-selection__choice__remove {
-        color: #fff;
-        margin-right: 5px;
-    }
-    .select2-container--bootstrap-5 .select2-selection--multiple .select2-selection__choice__remove:hover {
-        background-color: rgba(255,255,255,0.2);
-        color: #fff;
-    }
+    .ck-editor__editable { min-height: 200px; }
+    .border-dashed { border-style: dashed !important; border-width: 2px !important; }
 </style>
 @endpush
 
-
 @section('content')
-
 <div class="container-fluid">
-
-    <div class="card border-0 shadow-sm rounded-4">
-
-        <div class="card-header bg-white py-3">
-            <h4 class="mb-0">Edit Product</h4>
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('admin.products.index') }}">Products</a></li>
+                    <li class="breadcrumb-item active">Edit Product</li>
+                </ol>
+            </nav>
+            <h3 class="fw-bold text-dark">Edit Product: <span class="text-primary">{{ $product->name }}</span></h3>
         </div>
-
-        <div class="card-body">
-
-            <form action="{{ route('admin.products.update', $product->id) }}" method="POST" enctype="multipart/form-data">
-                @csrf
-                @method('PUT')
-
-                <div class="row">
-
-                    <div class="col-md-3 mb-3">
-                        <label>Brand</label>
-                        <select name="brand_id" class="form-select @error('brand_id') is-invalid @enderror">
-                            <option value="">Select Brand</option>
-                            @foreach($brands as $b)
-                                <option value="{{ $b->id }}" {{ (old('brand_id', $product->brand_id) == $b->id) ? 'selected' : '' }}>
-                                    {{ $b->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('brand_id') <small class="text-danger">{{ $message }}</small> @enderror
-                    </div>
-
-                    <div class="col-md-3 mb-3">
-                        <label>Category *</label>
-                        <select name="category_id" id="category_id" class="form-select @error('category_id') is-invalid @enderror" required>
-                            <option value="">Select Category</option>
-                            @foreach($categories as $c)
-                                <option value="{{ $c->id }}" {{ (old('category_id', $product->category_id) == $c->id) ? 'selected' : '' }}>
-                                    {{ $c->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('category_id') <small class="text-danger">{{ $message }}</small> @enderror
-                    </div>
-
-                    <div class="col-md-3 mb-3">
-                        <label>Subcategory *</label>
-                        <select name="subcategory_id" id="subcategory_id" class="form-select @error('subcategory_id') is-invalid @enderror" required>
-                            <option value="">Select Subcategory</option>
-                            @foreach($subcategories as $s)
-                                <option value="{{ $s->id }}" {{ (old('subcategory_id', $product->subcategory_id) == $s->id) ? 'selected' : '' }}>
-                                    {{ $s->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('subcategory_id') <small class="text-danger">{{ $message }}</small> @enderror
-                    </div>
-
-                    <div class="col-md-3 mb-3">
-                        <label>Child Category</label>
-                        <select name="child_category_id" id="child_category_id" class="form-select @error('child_category_id') is-invalid @enderror">
-                            <option value="">Select Child Category</option>
-                            @isset($childcategories)
-                                @foreach($childcategories as $child)
-                                    <option value="{{ $child->id }}" {{ (old('child_category_id', $product->child_category_id) == $child->id) ? 'selected' : '' }}>
-                                        {{ $child->name }}
-                                    </option>
-                                @endforeach
-                            @endisset
-                        </select>
-                        @error('child_category_id') <small class="text-danger">{{ $message }}</small> @enderror
-                    </div>
-
-                </div>
-
-                    <div class="col-md-12 mb-3">
-                        <label class="form-label fw-bold">Solutions</label>
-                        <select name="solution_ids[]" multiple class="form-select select2 @error('solution_ids') is-invalid @enderror">
-                            @foreach($solutions as $solution)
-                                <option value="{{ $solution->id }}" {{ collect(old('solution_ids', $product->solutions->pluck('id')->toArray()))->contains($solution->id) ? 'selected' : '' }}>
-                                    {{ $solution->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('solution_ids') <small class="text-danger">{{ $message }}</small> @enderror
-                    </div>
-
-                <div class="mb-3">
-                    <label>Product Name</label>
-                    <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" value="{{ old('name', $product->name) }}" required>
-                    @error('name') <small class="text-danger">{{ $message }}</small> @enderror
-                </div>
-                <div class="mb-3">
-                    <label>Part Code</label>
-                    <input type="text" name="part_code" class="form-control @error('part_code') is-invalid @enderror" value="{{ old('part_code', $product->part_code) }}" required>
-                    @error('part_code') <small class="text-danger">{{ $message }}</small> @enderror
-                </div>
-                <div class="mb-3">
-                    <label>Part Number</label>
-                    <input type="text" name="part_number" class="form-control @error('part_number') is-invalid @enderror" value="{{ old('part_number', $product->part_number) }}">
-                    @error('part_number') <small class="text-danger">{{ $message }}</small> @enderror
-                </div>
-                <div class="mb-3">
-                    <label>Product Title Tags</label>
-                    <input type="text"
-                           name="tags"
-                           class="form-control @error('tags') is-invalid @enderror"
-                           value="{{ old('tags', $product->tags) }}">
-                    @error('tags') <small class="text-danger">{{ $message }}</small> @enderror
-                </div>
-
-                {{-- IMAGE --}}
-                <div class="mb-3">
-                    <label>Main Thumbnail</label>
-                    @if($product->thumbnail)
-                        <div class="mb-2">
-                            <img src="{{ asset('uploads/products/'.$product->thumbnail) }}"
-                                 width="80" height="80"
-                                 class="rounded border">
-                        </div>
-                    @endif
-                    <input type="file" name="image" class="form-control @error('image') is-invalid @enderror" accept="image/*">
-                    @error('image') <small class="text-danger">{{ $message }}</small> @enderror
-                </div>
-
-                <div class="mb-3">
-                    <label>Product Gallery (Multiple Images)</label>
-                    <div class="d-flex flex-wrap gap-2 mb-2">
-                        @foreach($product->images as $img)
-                            <div class="position-relative gallery-item-{{ $img->id }}">
-                                <img src="{{ asset('uploads/products/gallery/'.$img->image) }}"
-                                     width="80" height="80"
-                                     class="rounded border object-fit-cover">
-                                <button type="button" 
-                                        class="btn btn-danger btn-sm position-absolute top-0 end-0 p-0 rounded-circle delete-gallery-img" 
-                                        data-id="{{ $img->id }}"
-                                        style="width:20px; height:20px; line-height:1;">
-                                    &times;
-                                </button>
-                            </div>
-                        @endforeach
-                    </div>
-                    <input type="file" name="images[]" id="gallery-input" class="form-control @error('images.*') is-invalid @enderror" accept="image/*" multiple>
-                    <div id="gallery-preview" class="d-flex flex-wrap gap-2 mt-2"></div>
-                    @error('images.*')
-                        <small class="text-danger">{{ $message }}</small>
-                    @enderror
-                </div>
-
-                {{-- CKEDITOR FIELDS --}}
-
-                <div class="mb-3">
-                    <label>Short Description</label>
-                    <textarea name="short_description" class="form-control @error('short_description') is-invalid @enderror">{{ old('short_description', $product->short_description) }}</textarea>
-                    @error('short_description') <small class="text-danger">{{ $message }}</small> @enderror
-                </div>
-
-                <div class="mb-3">
-                    <label>Variant</label>
-                    <textarea name="variant" class="form-control editor @error('variant') is-invalid @enderror">{{ old('variant', $product->variant) }}</textarea>
-                    @error('variant') <small class="text-danger">{{ $message }}</small> @enderror
-                </div>
-
-                <div class="mb-3">
-                    <label>Specifications</label>
-                    <textarea name="specifications" class="form-control editor @error('specifications') is-invalid @enderror">{{ old('specifications', $product->specifications) }}</textarea>
-                    @error('specifications') <small class="text-danger">{{ $message }}</small> @enderror
-                </div>
-
-                
-
-                <div class="mb-3">
-                    <label>Packaging</label>
-                    <textarea name="packaging" class="form-control editor @error('packaging') is-invalid @enderror">{{ old('packaging', $product->packaging) }}</textarea>
-                    @error('packaging') <small class="text-danger">{{ $message }}</small> @enderror
-                </div>
-
-                <div class="mb-3">
-                    <label>Additional Info</label>
-                    <textarea name="additional_info" class="form-control editor @error('additional_info') is-invalid @enderror">{{ old('additional_info', $product->additional_info) }}</textarea>
-                    @error('additional_info') <small class="text-danger">{{ $message }}</small> @enderror
-                </div>
-
-                <div class="row">
-
-                    <div class="col-md-6 mb-3">
-                        <label>Status</label>
-                        <select name="status" class="form-select @error('status') is-invalid @enderror" required>
-                            <option value="1" {{ old('status', $product->status) == 1 ? 'selected' : '' }}>Active</option>
-                            <option value="0" {{ old('status', $product->status) == 0 ? 'selected' : '' }}>Inactive</option>
-                        </select>
-                        @error('status') <small class="text-danger">{{ $message }}</small> @enderror
-                    </div>
-
-                    <div class="col-md-6 mb-3">
-                        <label>Featured</label>
-                        <select name="featured" class="form-select @error('featured') is-invalid @enderror">
-                            <option value="0" {{ old('featured', $product->featured) == 0 ? 'selected' : '' }}>No</option>
-                            <option value="1" {{ old('featured', $product->featured) == 1 ? 'selected' : '' }}>Yes</option>
-                        </select>
-                        @error('featured') <small class="text-danger">{{ $message }}</small> @enderror
-                    </div>
-
-                </div>
-
-                <hr class="my-4">
-                <h5 class="mb-3 text-primary">SEO Section</h5>
-
-                <div class="mb-3">
-                    <label>Meta Title</label>
-                    <input type="text" name="meta_title" value="{{ old('meta_title', $product->meta_title) }}" class="form-control">
-                </div>
-
-                <div class="mb-3">
-                    <label>Meta Description</label>
-                    <textarea name="meta_description" class="form-control" rows="3">{{ old('meta_description', $product->meta_description) }}</textarea>
-                </div>
-
-                <div class="mb-3">
-                    <label>Meta Keywords</label>
-                    <textarea name="meta_keywords" class="form-control" rows="2" placeholder="keyword1, keyword2, ...">{{ old('meta_keywords', $product->meta_keywords) }}</textarea>
-                </div>
-
-                <button class="btn btn-primary px-4">Update Product</button>
-
-            </form>
-
-        </div>
-
     </div>
 
+    <form action="{{ route('admin.products.update', $product->id) }}" method="POST" enctype="multipart/form-data">
+        @csrf
+        @method('PUT')
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Basic Information -->
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-header bg-white border-0 p-4">
+                        <h5 class="fw-bold mb-0">Basic Information</h5>
+                    </div>
+                    <div class="card-body p-4 pt-0">
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label class="form-label fw-semibold">Product Name <span class="text-danger">*</span></label>
+                                <input type="text" name="name" value="{{ old('name', $product->name) }}" class="form-control rounded-3 @error('name') is-invalid @enderror" required>
+                                @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Part Code <span class="text-danger">*</span></label>
+                                <input type="text" name="part_code" value="{{ old('part_code', $product->part_code) }}" class="form-control rounded-3 @error('part_code') is-invalid @enderror" required>
+                                @error('part_code') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Part Number</label>
+                                <input type="text" name="part_number" value="{{ old('part_number', $product->part_number) }}" class="form-control rounded-3">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Short Description</label>
+                                <textarea name="short_description" class="form-control rounded-3" rows="3">{{ old('short_description', $product->short_description) }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Content -->
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-header bg-white border-0 p-4">
+                        <h5 class="fw-bold mb-0">Detailed Content</h5>
+                    </div>
+                    <div class="card-body p-4 pt-0">
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Specifications</label>
+                            <textarea name="specifications" class="form-control editor">{{ old('specifications', $product->specifications) }}</textarea>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Variant Options</label>
+                            <textarea name="variant" class="form-control editor">{{ old('variant', $product->variant) }}</textarea>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Packaging Details</label>
+                            <textarea name="packaging" class="form-control editor">{{ old('packaging', $product->packaging) }}</textarea>
+                        </div>
+                        <div>
+                            <label class="form-label fw-semibold">Additional Information</label>
+                            <textarea name="additional_info" class="form-control editor">{{ old('additional_info', $product->additional_info) }}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SEO Section -->
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-header bg-white border-0 p-4">
+                        <h5 class="fw-bold mb-0 text-primary">SEO Optimization</h5>
+                    </div>
+                    <div class="card-body p-4 pt-0">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Meta Title</label>
+                                <input type="text" name="meta_title" value="{{ old('meta_title', $product->meta_title) }}" class="form-control rounded-3">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Meta Description</label>
+                                <textarea name="meta_description" class="form-control rounded-3" rows="3">{{ old('meta_description', $product->meta_description) }}</textarea>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Meta Keywords</label>
+                                <textarea name="meta_keywords" class="form-control rounded-3" rows="2">{{ old('meta_keywords', $product->meta_keywords) }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <!-- Classification -->
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-body p-4">
+                        <h6 class="fw-bold mb-3 border-bottom pb-2">Classification</h6>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small text-muted text-uppercase">Brand</label>
+                            <select name="brand_id" class="form-select rounded-3">
+                                <option value="">Select Brand</option>
+                                @foreach($brands as $b)
+                                    <option value="{{ $b->id }}" {{ old('brand_id', $product->brand_id) == $b->id ? 'selected' : '' }}>{{ $b->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small text-muted text-uppercase">Category *</label>
+                            <select name="category_id" id="category_id" class="form-select rounded-3" required>
+                                <option value="">Select Category</option>
+                                @foreach($categories as $c)
+                                    <option value="{{ $c->id }}" {{ old('category_id', $product->category_id) == $c->id ? 'selected' : '' }}>{{ $c->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small text-muted text-uppercase">Subcategory *</label>
+                            <select name="subcategory_id" id="subcategory_id" class="form-select rounded-3" required>
+                                <option value="">Select Subcategory</option>
+                                @foreach($subcategories as $s)
+                                    <option value="{{ $s->id }}" {{ old('subcategory_id', $product->subcategory_id) == $s->id ? 'selected' : '' }}>{{ $s->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small text-muted text-uppercase">Child Category</label>
+                            <select name="child_category_id" id="child_category_id" class="form-select rounded-3">
+                                <option value="">Select Child Category</option>
+                                @isset($childcategories)
+                                    @foreach($childcategories as $child)
+                                        <option value="{{ $child->id }}" {{ old('child_category_id', $product->child_category_id) == $child->id ? 'selected' : '' }}>{{ $child->name }}</option>
+                                    @endforeach
+                                @endisset
+                            </select>
+                        </div>
+                        <div class="mb-0">
+                            <label class="form-label fw-semibold small text-muted text-uppercase">Associated Solutions</label>
+                            <select name="solution_ids[]" multiple class="form-select select2">
+                                @foreach($solutions as $solution)
+                                    <option value="{{ $solution->id }}" {{ collect(old('solution_ids', $product->solutions->pluck('id')->toArray()))->contains($solution->id) ? 'selected' : '' }}>{{ $solution->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Media -->
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-body p-4">
+                        <h6 class="fw-bold mb-3 border-bottom pb-2">Product Media</h6>
+                        <div class="mb-4 text-center">
+                            <label class="form-label fw-semibold small text-muted text-uppercase d-block text-start">Main Thumbnail</label>
+                            @if($product->thumbnail)
+                                <img src="{{ asset('uploads/products/'.$product->thumbnail) }}" class="rounded-3 shadow-sm border p-1 bg-white mb-3" style="max-height: 120px;">
+                            @endif
+                            <div class="p-3 border border-dashed rounded-4 text-center bg-light">
+                                <input type="file" name="image" class="form-control form-control-sm" accept="image/*">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="form-label fw-semibold small text-muted text-uppercase">Gallery Images</label>
+                            <div class="d-flex flex-wrap gap-2 mb-3">
+                                @foreach($product->images as $img)
+                                    <div class="position-relative gallery-item-{{ $img->id }}">
+                                        <img src="{{ asset('uploads/products/gallery/'.$img->image) }}" class="rounded shadow-sm border" style="width: 60px; height: 60px; object-fit: cover;">
+                                        <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 p-0 rounded-circle delete-gallery-img" data-id="{{ $img->id }}" style="width:18px; height:18px; font-size:10px;">&times;</button>
+                                    </div>
+                                @endforeach
+                            </div>
+                            <div class="p-3 border border-dashed rounded-4 text-center bg-light">
+                                <input type="file" name="images[]" id="gallery-input" class="form-control form-control-sm" accept="image/*" multiple>
+                            </div>
+                            <div id="gallery-preview" class="d-flex flex-wrap gap-2 mt-2"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings -->
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-body p-4">
+                        <h6 class="fw-bold mb-3 border-bottom pb-2">Visibility & Settings</h6>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small text-muted text-uppercase">Status</label>
+                            <select name="status" class="form-select rounded-3" required>
+                                <option value="1" {{ old('status', $product->status) == 1 ? 'selected' : '' }}>Active</option>
+                                <option value="0" {{ old('status', $product->status) == 0 ? 'selected' : '' }}>Inactive</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold small text-muted text-uppercase">Featured Product</label>
+                            <select name="featured" class="form-select rounded-3">
+                                <option value="0" {{ old('featured', $product->featured) == 0 ? 'selected' : '' }}>No</option>
+                                <option value="1" {{ old('featured', $product->featured) == 1 ? 'selected' : '' }}>Yes</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="card border-0 shadow-sm rounded-4 sticky-top" style="top: 100px; z-index: 1;">
+                    <div class="card-body p-4">
+                        <button type="submit" class="btn btn-primary w-100 rounded-pill py-2 mb-2 shadow">
+                            <i class="fa-solid fa-circle-check me-2"></i>Update Product
+                        </button>
+                        <a href="{{ route('admin.products.index') }}" class="btn btn-outline-secondary w-100 rounded-pill py-2">
+                            Back to List
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
 </div>
 
 @push('js')
@@ -260,117 +243,85 @@
 <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
 
 <script>
-document.querySelectorAll('.editor').forEach((el) => {
-    ClassicEditor
-        .create(el)
-        .catch(error => {
-            console.error(error);
-        });
-});
-
-$(document).ready(function() {
-    $('.select2').select2({
-        theme: 'bootstrap-5',
-        placeholder: 'Select Solutions',
-        allowClear: true
+    document.querySelectorAll('.editor').forEach((el) => {
+        ClassicEditor.create(el).catch(error => { console.error(error); });
     });
 
-    $('#category_id').on('change', function() {
-        var categoryId = $(this).val();
-        var subcategoryDropdown = $('#subcategory_id');
-        var childcategoryDropdown = $('#child_category_id');
+    $(document).ready(function() {
+        $('.select2').select2({ theme: 'bootstrap-5', placeholder: 'Select Solutions' });
 
-        subcategoryDropdown.html('<option value="">Loading...</option>');
-        childcategoryDropdown.html('<option value="">Select Child Category</option>');
-
-        if(categoryId) {
-            $.ajax({
-                url: '{{ url("admin/get-subcategories") }}/' + categoryId,
-                type: 'GET',
-                success: function(data) {
-                    subcategoryDropdown.html('<option value="">Select Subcategory</option>');
-                    $.each(data, function(key, value) {
-                        subcategoryDropdown.append('<option value="'+ value.id +'">'+ value.name +'</option>');
-                    });
-                }
-            });
-        } else {
-            subcategoryDropdown.html('<option value="">Select Subcategory</option>');
-        }
-    });
-
-    $('#subcategory_id').on('change', function() {
-        var subcategoryId = $(this).val();
-        var childcategoryDropdown = $('#child_category_id');
-
-        childcategoryDropdown.html('<option value="">Loading...</option>');
-
-        if(subcategoryId) {
-            $.ajax({
-                url: '{{ url("admin/get-childcategories") }}/' + subcategoryId,
-                type: 'GET',
-                success: function(data) {
-                    childcategoryDropdown.html('<option value="">Select Child Category</option>');
-                    $.each(data, function(key, value) {
-                        childcategoryDropdown.append('<option value="'+ value.id +'">'+ value.name +'</option>');
-                    });
-                }
-            });
-        } else {
-            childcategoryDropdown.html('<option value="">Select Child Category</option>');
-        }
-    });
-
-    // Gallery Preview
-    $('#gallery-input').on('change', function() {
-        var preview = $('#gallery-preview');
-        preview.html('');
-        if (this.files) {
-            $.each(this.files, function(i, file) {
-                var reader = new FileReader();
-                reader.onload = function(e) {
-                    preview.append('<div class="position-relative"><img src="'+e.target.result+'" class="img-thumbnail" style="width:100px; height:100px; object-fit:cover;"></div>');
-                }
-                reader.readAsDataURL(file);
-            });
-        }
-    });
-
-    // Delete Gallery Image
-    $('.delete-gallery-img').on('click', function() {
-        var id = $(this).data('id');
-        var item = $('.gallery-item-' + id);
-        
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "You want to delete this gallery image?",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Yes, delete it!'
-        }).then((result) => {
-            if (result.isConfirmed) {
+        $('#category_id').on('change', function() {
+            var categoryId = $(this).val();
+            var subcategoryDropdown = $('#subcategory_id');
+            subcategoryDropdown.html('<option value="">Loading...</option>');
+            if(categoryId) {
                 $.ajax({
-                    url: '{{ url("admin/product-images") }}/' + id,
-                    type: 'DELETE',
-                    data: {
-                        _token: '{{ csrf_token() }}'
-                    },
-                    success: function(response) {
-                        item.remove();
-                        Swal.fire(
-                            'Deleted!',
-                            'Image has been deleted.',
-                            'success'
-                        )
+                    url: '{{ url("admin/get-subcategories") }}/' + categoryId,
+                    type: 'GET',
+                    success: function(data) {
+                        subcategoryDropdown.html('<option value="">Select Subcategory</option>');
+                        $.each(data, function(key, value) {
+                            subcategoryDropdown.append('<option value="'+ value.id +'">'+ value.name +'</option>');
+                        });
                     }
                 });
             }
         });
+
+        $('#subcategory_id').on('change', function() {
+            var subcategoryId = $(this).val();
+            var childcategoryDropdown = $('#child_category_id');
+            childcategoryDropdown.html('<option value="">Loading...</option>');
+            if(subcategoryId) {
+                $.ajax({
+                    url: '{{ url("admin/get-childcategories") }}/' + subcategoryId,
+                    type: 'GET',
+                    success: function(data) {
+                        childcategoryDropdown.html('<option value="">Select Child Category</option>');
+                        $.each(data, function(key, value) {
+                            childcategoryDropdown.append('<option value="'+ value.id +'">'+ value.name +'</option>');
+                        });
+                    }
+                });
+            }
+        });
+
+        $('#gallery-input').on('change', function() {
+            var preview = $('#gallery-preview');
+            preview.html('');
+            if (this.files) {
+                $.each(this.files, function(i, file) {
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        preview.append('<img src="'+e.target.result+'" class="img-thumbnail" style="width:70px; height:70px; object-fit:cover;">');
+                    }
+                    reader.readAsDataURL(file);
+                });
+            }
+        });
+
+        $('.delete-gallery-img').on('click', function() {
+            var id = $(this).data('id');
+            var item = $('.gallery-item-' + id);
+            Swal.fire({
+                title: 'Delete Image?',
+                text: "This gallery image will be removed!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '{{ url("admin/product-images") }}/' + id,
+                        type: 'DELETE',
+                        data: { _token: '{{ csrf_token() }}' },
+                        success: function() { item.remove(); }
+                    });
+                }
+            });
+        });
     });
-});
 </script>
 @endpush
-
 @endsection

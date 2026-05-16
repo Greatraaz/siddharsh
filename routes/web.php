@@ -13,9 +13,11 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Admin\SolutionController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\NewsletterController;
+use App\Http\Controllers\Admin\SystemController;
 
 /*
 |--------------------------------------------------------------------------
@@ -104,8 +106,7 @@ Route::prefix('admin')
         |--------------------------------------------------------------------------
         | Dashboard
         |--------------------------------------------------------------------------
-        */
-
+        |*/
         Route::get('/dashboard', [DashboardController::class, 'index'])
             ->name('dashboard');
 
@@ -114,28 +115,25 @@ Route::prefix('admin')
         |--------------------------------------------------------------------------
         | Brands
         |--------------------------------------------------------------------------
-        */
-
-         Route::resource('brands', BrandController::class);
+        |*/
+         Route::resource('brands', BrandController::class)->middleware('permission:view-brands');
 
 
         /*
         |--------------------------------------------------------------------------
         | Categories
         |--------------------------------------------------------------------------
-        */
-
-        Route::resource('categories', CategoryController::class);
+        |*/
+        Route::resource('categories', CategoryController::class)->middleware('permission:view-categories');
 
 
         /*
         |--------------------------------------------------------------------------
         | Subcategories & Child Categories
         |--------------------------------------------------------------------------
-        */
-
-        Route::resource('subcategories', SubcategoryController::class);
-        Route::resource('childcategories', ChildCategoryController::class);
+        |*/
+        Route::resource('subcategories', SubcategoryController::class)->middleware('permission:view-subcategories');
+        Route::resource('childcategories', ChildCategoryController::class)->middleware('permission:view-childcategories');
 
         // AJAX Routes for Dependent Dropdowns
         Route::get('/get-subcategories/{category_id}', [CategoryController::class, 'getSubcategories']);
@@ -146,29 +144,30 @@ Route::prefix('admin')
         |--------------------------------------------------------------------------
         | Products
         |--------------------------------------------------------------------------
-        */
-
-        Route::get('/products/import/template', [ProductController::class, 'downloadTemplate'])->name('products.import.template');
-        Route::get('/products/import', [ProductController::class, 'importPage'])->name('products.import');
-        Route::post('/products/import', [ProductController::class, 'import'])->name('products.import.submit');
-        Route::get('/products/import/status/{id}', [ProductController::class, 'importStatus'])->name('products.import.status');
-        Route::get('/products/export', [ProductController::class, 'export'])->name('products.export');
+        |*/
+        Route::get('/products/import/template', [ProductController::class, 'downloadTemplate'])->name('products.import.template')->middleware('permission:import-products');
+        Route::get('/products/import', [ProductController::class, 'importPage'])->name('products.import')->middleware('permission:import-products');
+        Route::post('/products/import', [ProductController::class, 'import'])->name('products.import.submit')->middleware('permission:import-products');
+        Route::get('/products/import/status/{id}', [ProductController::class, 'importStatus'])->name('products.import.status')->middleware('permission:import-products');
+        Route::get('/products/import-logs', [ProductController::class, 'importLogs'])->name('products.import-logs')->middleware('permission:import-products');
+        Route::get('/products/import-logs/{id}', [ProductController::class, 'importLogShow'])->name('products.import-logs.show')->middleware('permission:import-products');
+        Route::get('/products/export', [ProductController::class, 'export'])->name('products.export')->middleware('permission:export-products');
         
 
-        Route::resource('products', ProductController::class);
-        Route::resource('solutions', SolutionController::class);
+        Route::resource('products', ProductController::class)->middleware('permission:view-products');
+        Route::resource('solutions', SolutionController::class)->middleware('permission:view-solutions');
 
-        Route::delete('/product-images/{id}', [ProductController::class, 'deleteImage'])->name('product-images.destroy');
+        Route::delete('/product-images/{id}', [ProductController::class, 'deleteImage'])->name('product-images.destroy')->middleware('permission:edit-products');
 
         /*
         |--------------------------------------------------------------------------
         | Access Control
         |--------------------------------------------------------------------------
-        */
-
-        Route::resource('roles', RoleController::class);
-        Route::resource('users', UserController::class);
-        Route::resource('newsletters', NewsletterController::class);
+        |*/
+        Route::resource('roles', RoleController::class)->middleware('permission:view-roles');
+        Route::resource('permissions', PermissionController::class)->middleware('permission:view-permissions');
+        Route::resource('users', UserController::class)->middleware('permission:view-users');
+        Route::resource('newsletters', NewsletterController::class)->middleware('permission:view-newsletters');
 
         /*
         |--------------------------------------------------------------------------
@@ -199,6 +198,16 @@ Route::prefix('admin')
 
         Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
         Route::post('/settings', [SettingController::class, 'update'])->name('settings.update');
+
+        /*
+        |--------------------------------------------------------------------------
+        | System Management
+        |--------------------------------------------------------------------------
+        */
+        Route::get('/system', [SystemController::class, 'index'])->name('system.index')->middleware('permission:manage-system');
+        Route::post('/system/command', [SystemController::class, 'runCommand'])->name('system.command')->middleware('permission:manage-system');
+        Route::post('/system/storage-link', [SystemController::class, 'storageLink'])->name('system.storage-link')->middleware('permission:manage-system');
+        Route::post('/system/clear-logs', [SystemController::class, 'clearLogs'])->name('system.clear-logs')->middleware('permission:manage-system');
 
 
         /*

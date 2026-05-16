@@ -64,7 +64,7 @@ class ProductsImport implements OnEachRow, WithChunkReading, SkipsEmptyRows, Wit
         $partCode = $this->stringValue($this->getCell($data, 'part_code'));
 
         if ($name === '') {
-            $this->logSkippedRow($rowIndex, $partCode, $name, 'Product name is required.');
+            $this->logSkippedRow($rowIndex, $partCode, $name, 'Product name is required.', $data);
             return;
         }
 
@@ -72,7 +72,7 @@ class ProductsImport implements OnEachRow, WithChunkReading, SkipsEmptyRows, Wit
         if ($partCode !== '') {
             $existingProduct = Product::withTrashed()->where('part_code', $partCode)->first();
             if ($existingProduct && $existingProduct->name !== $name) {
-                $this->logSkippedRow($rowIndex, $partCode, $name, 'Duplicate part_code: ' . $partCode . ' already exists for another product.');
+                $this->logSkippedRow($rowIndex, $partCode, $name, 'Duplicate part_code: ' . $partCode . ' already exists for another product.', $data);
                 return;
             }
         }
@@ -82,18 +82,18 @@ class ProductsImport implements OnEachRow, WithChunkReading, SkipsEmptyRows, Wit
         $childCell = $this->stringValue($this->getCell($data, 'child_category', 'childcategory'));
 
         if ($categoryName === '') {
-            $this->logSkippedRow($rowIndex, $partCode, $name, 'Category is required.');
+            $this->logSkippedRow($rowIndex, $partCode, $name, 'SKIPPED: Category column is empty in Excel.', $data, 'category');
             return;
         }
 
         if ($subName === '' && $childCell === '') {
-            $this->logSkippedRow($rowIndex, $partCode, $name, 'Either sub_category or child_category is required.');
+            $this->logSkippedRow($rowIndex, $partCode, $name, 'SKIPPED: Both Subcategory and Child Category columns are empty.', $data, 'subcategory');
             return;
         }
 
         $category = $this->resolveCategory($categoryName);
         if (! $category) {
-            $this->logSkippedRow($rowIndex, $partCode, $name, 'Category not found: '.$categoryName);
+            $this->logSkippedRow($rowIndex, $partCode, $name, "UNMATCHED CATEGORY: '{$categoryName}' does not exist in the database.", $data, 'category');
             return;
         }
 
@@ -101,39 +101,43 @@ class ProductsImport implements OnEachRow, WithChunkReading, SkipsEmptyRows, Wit
         $childCategoryId = null;
 
         if ($subName !== '') {
-            // Case 1 & 2: Standard hierarchy structure
             $subcategory = $this->resolveSubcategory($category->id, $subName);
             
-            if ($subcategory) {
-                if ($childCell !== '') {
-                    $child = $this->resolveChildCategory($category->id, $subcategory->id, $childCell);
-                    if ($child) {
-                        $childCategoryId = $child->id;
-                    }
+            if (!$subcategory) {
+                $this->logSkippedRow($rowIndex, $partCode, $name, "UNMATCHED SUBCATEGORY: '{$subName}' not found under '{$categoryName}' in system.", $data, 'subcategory');
+                return;
+            }
+
+            if ($childCell !== '') {
+                $child = $this->resolveChildCategory($category->id, $subcategory->id, $childCell);
+                if ($child) {
+                    $childCategoryId = $child->id;
+                } else {
+                    $this->logWarningRow($rowIndex, $partCode, $name, "UNMATCHED CHILD CATEGORY: '{$childCell}' not found under '{$subName}'. Importing with Subcategory only.", $data, 'child_category');
                 }
             }
         } else {
-            // Case 3: Mixed hierarchy support
+            // Mixed hierarchy support
             $levelName = $childCell;
             
             if ($levelName !== '') {
-                // First search inside Subcategories for this category
                 $subcategory = $this->resolveSubcategory($category->id, $levelName);
                 
                 if (!$subcategory) {
-                    // Else search inside Child Categories globally
                     $child = ChildCategory::whereRaw('LOWER(name) = ?', [Str::lower($levelName)])->first();
                     if ($child) {
                         $childCategoryId = $child->id;
                         $subcategory = $child->subcategory;
+                    } else {
+                        $this->logSkippedRow($rowIndex, $partCode, $name, "UNMATCHED HIERARCHY: '{$levelName}' could not be matched to any Subcategory or Child Category for '{$categoryName}'.", $data, 'child_category');
+                        return;
                     }
                 }
             }
         }
 
-        // Skip only if sub category not found (either directly or via child)
         if ($subcategory === null) {
-            $this->logSkippedRow($rowIndex, $partCode, $name, 'Subcategory / Child category not found for hierarchy mapping.');
+            $this->logSkippedRow($rowIndex, $partCode, $name, "UNMATCHED HIERARCHY: Could not find a valid mapping for the provided categories.", $data, 'subcategory');
             return;
         }
 
@@ -142,7 +146,7 @@ class ProductsImport implements OnEachRow, WithChunkReading, SkipsEmptyRows, Wit
         if ($brandCell !== '') {
             $brandId = $this->resolveBrandId($brandCell);
             if ($brandId === null) {
-                $this->logSkippedRow($rowIndex, $partCode, $name, 'Brand not found: '.$brandCell);
+                $this->logSkippedRow($rowIndex, $partCode, $name, "UNMATCHED BRAND: '{$brandCell}' not found in database.", $data, 'brand');
                 return;
             }
         }
@@ -244,14 +248,17 @@ class ProductsImport implements OnEachRow, WithChunkReading, SkipsEmptyRows, Wit
                 }
             });
 
+            // Log Success
+            $this->logDetailedRow($rowIndex, $partCode, $name, 'imported', 'Product imported successfully.', $data);
+
             // Log warning if thumbnail was missing
             if ($thumbnailWarning) {
-                $this->logWarningRow($rowIndex, $partCode, $name, $thumbnailWarning);
+                $this->logWarningRow($rowIndex, $partCode, $name, $thumbnailWarning, $data);
             }
 
             $this->applyLogDelta(1, 0, 0, $thumbnailWarning ? 1 : 0, []);
         } catch (\Throwable $e) {
-            $this->logFailedRow($rowIndex, $partCode, $name, 'Database error: ' . $e->getMessage());
+            $this->logFailedRow($rowIndex, $partCode, $name, 'Database error: ' . $e->getMessage(), $data);
         }
     }
 
@@ -266,25 +273,25 @@ class ProductsImport implements OnEachRow, WithChunkReading, SkipsEmptyRows, Wit
         $this->applyLogDelta(0, 1, $errors);
     }
 
-    private function logSkippedRow(int $rowIndex, string $partCode, string $productName, string $message): void
+    private function logSkippedRow(int $rowIndex, string $partCode, string $productName, string $message, array $row = [], ?string $failedOn = null): void
     {
-        $this->logDetailedRow($rowIndex, $partCode, $productName, 'skipped', $message);
+        $this->logDetailedRow($rowIndex, $partCode, $productName, 'skipped', $message, $row, $failedOn);
         $this->applyLogDelta(0, 1, 0, 0, []);
     }
 
-    private function logFailedRow(int $rowIndex, string $partCode, string $productName, string $message): void
+    private function logFailedRow(int $rowIndex, string $partCode, string $productName, string $message, array $row = [], ?string $failedOn = null): void
     {
-        $this->logDetailedRow($rowIndex, $partCode, $productName, 'failed', $message);
+        $this->logDetailedRow($rowIndex, $partCode, $productName, 'failed', $message, $row, $failedOn);
         $this->applyLogDelta(0, 0, 1, 0, []);
     }
 
-    private function logWarningRow(int $rowIndex, string $partCode, string $productName, string $message): void
+    private function logWarningRow(int $rowIndex, string $partCode, string $productName, string $message, array $row = [], ?string $failedOn = null): void
     {
-        $this->logDetailedRow($rowIndex, $partCode, $productName, 'warning', $message);
+        $this->logDetailedRow($rowIndex, $partCode, $productName, 'warning', $message, $row, $failedOn);
         $this->applyLogDelta(0, 0, 0, 1, []);
     }
 
-    private function logDetailedRow(int $rowIndex, string $partCode, string $productName, string $status, string $message): void
+    private function logDetailedRow(int $rowIndex, string $partCode, string $productName, string $status, string $message, array $row = [], ?string $failedOn = null): void
     {
         $log = ProductImportLog::find($this->importLogId);
         if (!$log) {
@@ -295,6 +302,10 @@ class ProductsImport implements OnEachRow, WithChunkReading, SkipsEmptyRows, Wit
             'row' => $rowIndex,
             'part_code' => $partCode,
             'product_name' => $productName,
+            'category' => $this->stringValue($this->getCell($row, 'category')),
+            'subcategory' => $this->stringValue($this->getCell($row, 'sub_category', 'subcategory')),
+            'child_category' => $this->stringValue($this->getCell($row, 'child_category', 'childcategory')),
+            'failed_on' => $failedOn,
             'status' => $status,
             'message' => $message,
             'timestamp' => now()->toISOString(),

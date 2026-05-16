@@ -1,117 +1,153 @@
 @extends('admin.layouts.app')
 
+@section('title', 'Customer Enquiries')
+
 @section('content')
-<div class="container-fluid px-4">
-    <div class="d-flex justify-content-between align-items-center my-4">
-        <h1 class="h3 mb-0 text-gray-800">All Customer Enquiries</h1>
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h3 class="fw-bold text-dark mb-1">Customer Enquiries</h3>
+            <p class="text-muted">Manage and respond to customer queries from the website.</p>
+        </div>
     </div>
 
-    @if(session('success'))
-        <div class="alert alert-success border-0 shadow-sm alert-dismissible fade show" role="alert">
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    @endif
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body p-4">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle" id="enquiryTable">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="ps-4 border-0 text-uppercase small fw-bold text-muted">Status</th>
+                                    <th class="border-0 text-uppercase small fw-bold text-muted">Type</th>
+                                    <th class="border-0 text-uppercase small fw-bold text-muted">Date</th>
+                                    <th class="border-0 text-uppercase small fw-bold text-muted">Customer</th>
+                                    <th class="border-0 text-uppercase small fw-bold text-muted">Inquiry About</th>
+                                    <th class="text-end pe-4 border-0 text-uppercase small fw-bold text-muted">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($enquiries as $enquiry)
+                                <tr class="{{ $enquiry->is_read ? '' : 'bg-primary bg-opacity-10' }}" style="transition: background 0.3s;">
+                                    <td class="ps-4">
+                                        @if($enquiry->is_read)
+                                            <span class="badge bg-light text-muted border rounded-pill px-3">Read</span>
+                                        @else
+                                            <span class="badge bg-primary rounded-pill px-3 shadow-sm">New</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($enquiry->product_id)
+                                            <span class="badge bg-info bg-opacity-10 text-info rounded-pill px-2 small">Product</span>
+                                        @elseif($enquiry->brand_id)
+                                            <span class="badge bg-warning bg-opacity-10 text-warning rounded-pill px-2 small">Brand</span>
+                                        @else
+                                            <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-2 small">Contact</span>
+                                        @endif
+                                    </td>
+                                    <td class="text-muted small">{{ $enquiry->created_at->format('M d, Y') }}</td>
+                                    <td>
+                                        <div class="fw-bold text-dark">{{ $enquiry->name }}</div>
+                                        <div class="small text-muted">{{ $enquiry->email }}</div>
+                                    </td>
+                                    <td>
+                                        @if($enquiry->product)
+                                            <div class="small fw-bold text-primary">{{ Str::limit($enquiry->product->name, 30) }}</div>
+                                        @elseif($enquiry->brand)
+                                            <div class="small fw-bold text-primary">{{ $enquiry->brand->name }}</div>
+                                        @elseif($enquiry->subject)
+                                            <div class="small fw-bold text-dark">{{ Str::limit($enquiry->subject, 30) }}</div>
+                                        @else
+                                            <span class="text-muted small italic">General Inquiry</span>
+                                        @endif
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <div class="btn-group shadow-sm rounded-3 overflow-hidden">
+                                            @can('view-enquiries')
+                                            <a href="{{ route('admin.enquiries.show', $enquiry->id) }}" class="btn btn-white btn-sm px-3" title="View Enquiry">
+                                                <i class="fa-solid fa-eye text-primary"></i>
+                                            </a>
+                                            @endcan
+                                            
+                                            @if(!$enquiry->is_read)
+                                                @can('mark-enquiries-read')
+                                                <form action="{{ route('admin.enquiries.mark-as-read', $enquiry->id) }}" method="POST" class="d-inline">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-white btn-sm px-3" title="Mark as Read">
+                                                        <i class="fa-solid fa-check text-success"></i>
+                                                    </button>
+                                                </form>
+                                                @endcan
+                                            @endif
 
-    <div class="card shadow-sm border-0 mb-4">
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="bg-light">
-                        <tr>
-                            <th class="px-4 py-3">Status</th>
-                            <th class="py-3">Type</th>
-                            <th class="py-3">Date</th>
-                            <th class="py-3">Name</th>
-                            <th class="py-3">Details</th>
-                            <th class="py-3 text-end px-4">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($enquiries as $enquiry)
-                        <tr class="{{ $enquiry->is_read ? 'text-muted' : 'fw-bold' }}">
-                            <td class="px-4">
-                                @if($enquiry->is_read)
-                                    <span class="badge bg-light text-muted border">Read</span>
-                                @else
-                                    <span class="badge bg-primary">New</span>
-                                @endif
-                            </td>
-                            <td>
-                                @if($enquiry->product_id)
-                                    <span class="badge bg-info-subtle text-info border border-info-subtle">Product</span>
-                                @elseif($enquiry->brand_id)
-                                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle">Brand</span>
-                                @else
-                                    <span class="badge bg-success-subtle text-success border border-success-subtle">Contact</span>
-                                @endif
-                            </td>
-                            <td>{{ $enquiry->created_at->format('d M, Y') }}</td>
-                            <td>
-                                <div class="fw-bold">{{ $enquiry->name }}</div>
-                                <div class="small text-muted">{{ $enquiry->email }}</div>
-                            </td>
-                            <td>
-                                @if($enquiry->product)
-                                    <div class="small fw-bold text-dark">Prod: {{ Str::limit($enquiry->product->name, 25) }}</div>
-                                @elseif($enquiry->brand)
-                                    <div class="small fw-bold text-dark">Brand: {{ $enquiry->brand->name }}</div>
-                                @elseif($enquiry->subject)
-                                    <div class="small fw-bold text-dark">Sub: {{ Str::limit($enquiry->subject, 25) }}</div>
-                                @else
-                                    <span class="text-muted small">No specific details</span>
-                                @endif
-                            </td>
-                            <td class="text-end px-4">
-                                <div class="btn-group shadow-sm rounded">
-                                    <a href="{{ route('admin.enquiries.show', $enquiry->id) }}" class="btn btn-sm btn-white border" title="View Detail">
-                                        <i class="fa-solid fa-eye text-primary"></i>
-                                    </a>
-                                    @if(!$enquiry->is_read)
-                                    <form action="{{ route('admin.enquiries.mark-as-read', $enquiry->id) }}" method="POST" class="d-inline">
-                                        @csrf
-                                        <button type="submit" class="btn btn-sm btn-white border" title="Mark as Read">
-                                            <i class="fa-solid fa-check text-success"></i>
-                                        </button>
-                                    </form>
-                                    @endif
-                                    <form action="{{ route('admin.enquiries.destroy', $enquiry->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this enquiry?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-white border" title="Delete">
-                                            <i class="fa-solid fa-trash text-danger"></i>
-                                        </button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                        @empty
-                        <tr>
-                            <td colspan="6" class="text-center py-5">
-                                <div class="text-muted">
-                                    <i class="fa-solid fa-envelope-open fa-3x mb-3 opacity-25"></i>
-                                    <p class="mb-0">No enquiries found yet.</p>
-                                </div>
-                            </td>
-                        </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+                                            @can('delete-enquiries')
+                                            <form action="{{ route('admin.enquiries.destroy', $enquiry->id) }}" method="POST" class="d-inline form-delete">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="button" class="btn btn-white btn-sm px-3 btn-delete" title="Delete Enquiry">
+                                                    <i class="fa-solid fa-trash-can text-danger"></i>
+                                                </button>
+                                            </form>
+                                            @endcan
+                                        </div>
+                                    </td>
+                                </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="6" class="text-center py-5 text-muted">No enquiries found.</td>
+                                </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
-        @if($enquiries->hasPages())
-        <div class="card-footer bg-white border-0 py-3">
-            {{ $enquiries->links() }}
-        </div>
-        @endif
     </div>
 </div>
-@endsection
 
-@push('styles')
-<style>
-    .btn-white { background: #fff; }
-    .btn-white:hover { background: #f8f9fa; }
-    .fw-bold { font-weight: 600 !important; }
-</style>
+@push('js')
+<script>
+    $(document).ready(function() {
+        $('#enquiryTable').DataTable({
+            "pageLength": 15,
+            "ordering": true,
+            "responsive": true,
+            "language": {
+                "search": "_INPUT_",
+                "searchPlaceholder": "Filter enquiries..."
+            }
+        });
+
+        $(document).on('click', '.btn-delete', function() {
+            let form = $(this).closest('form');
+            Swal.fire({
+                title: 'Delete Enquiry?',
+                text: "This message will be permanently removed from the records!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Yes, Delete',
+                borderRadius: '15px'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            })
+        });
+    });
+</script>
 @endpush
+
+<style>
+    .btn-white {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+    }
+    .btn-white:hover {
+        background: #f8fafc;
+    }
+</style>
+@endsection

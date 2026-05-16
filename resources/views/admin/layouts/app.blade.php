@@ -182,7 +182,31 @@
 
         /* Soft Utilities */
         .bg-primary-soft { background-color: rgba(79, 70, 229, 0.1) !important; }
+        .bg-success-soft { background-color: rgba(16, 185, 129, 0.1) !important; }
+        .bg-warning-soft { background-color: rgba(245, 158, 11, 0.1) !important; }
+        .bg-info-soft { background-color: rgba(6, 182, 212, 0.1) !important; }
+        .bg-danger-soft { background-color: rgba(239, 68, 68, 0.1) !important; }
+        
         .text-primary-soft { color: #4f46e5 !important; }
+        
+        .transition-all { transition: all 0.3s ease; }
+        .cursor-pointer { cursor: pointer; }
+        
+        .hover-lift:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--soft-shadow);
+        }
+
+        .btn-white {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            color: #64748b;
+        }
+
+        .btn-white:hover {
+            background: #f8fafc;
+            color: #4f46e5;
+        }
     </style>
     @stack('css')
 </head>
